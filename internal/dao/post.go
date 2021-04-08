@@ -25,7 +25,7 @@ func (d *Dao) GetPostList(page, pageSize int, filter string) ([]*model.Post, err
 	return p.List(d.engine, pageOffset, pageSize, filter)
 }
 
-func (d *Dao) CreatePost(title, desc, descImg, content, createdBy string) error {
+func (d *Dao) CreatePost(title, desc, descImg, content, createdBy string) *model.Post {
 	p := model.Post{
 		Title: title,
 		Desc: desc,

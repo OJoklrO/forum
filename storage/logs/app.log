@@ -10,3 +10,6 @@
 2021/04/08 13:56:40 {"callers":["/home/joklr/GoProgram/forum/main.go: 20 main.init.0"],"level":"info","message":"Get id: 1","time":1617861400594608437}
 2021/04/08 14:51:41 {"callers":["/home/joklr/GoProgram/forum/main.go: 20 main.init.0"],"level":"error","message":"app.BindAndValid errs: ","time":1617864701001866771}
 2021/04/08 16:57:34 {"callers":["/home/joklr/GoProgram/forum/main.go: 20 main.init.0"],"level":"error","message":"svc.CreateAuth err: Error 1054: Unknown column 'u_name' in 'field list'","time":1617872254769826997}
+2021/04/08 17:39:02 {"callers":["/home/joklr/GoProgram/forum/main.go: 20 main.init.0"],"level":"info","message":"middleware.JWT token: ","time":1617874742957438640}
+2021/04/08 17:39:31 {"callers":["/home/joklr/GoProgram/forum/main.go: 20 main.init.0"],"level":"info","message":"","time":1617874771415311910}
+2021/04/08 17:40:35 {"callers":["/home/joklr/GoProgram/forum/main.go: 20 main.init.0"],"level":"info","message":"middleware.JWT token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBfa2V5IjoiOTllYTY4OTBlMWU0MzJkN2M2NTE2ZTczNTM3N2E4Y2EiLCJhcHBfc2VjcmV0IjoiOTdjMzFlOGVkYWU0MDJhZDgxZWQ4MTZlOTM4ZTNkZTMiLCJleHAiOjE2MTc4ODE1MjgsImlzcyI6ImEzLWdyb3VwIn0.q8xd0xTwMDABE634slRF3p-3M6L7wzf-2mbAym4pA64","time":1617874835163968471}

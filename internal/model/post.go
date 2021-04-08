@@ -51,8 +51,8 @@ func (p Post) List(db *gorm.DB, pageOffset, pageSize int, filter string) ([]*Pos
 	return posts, nil
 }
 
-func (p Post) Create(db *gorm.DB) error {
-	return db.Create(&p).Error
+func (p Post) Create(db *gorm.DB) *Post {
+	return db.Create(&p).Value.(*Post)
 }
 
 func (p Post) Update(db *gorm.DB, v interface{}) error {

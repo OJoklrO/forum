@@ -22,7 +22,7 @@ type CreatePostRequest struct {
 	Title     string `form:"title" binding:"required,min=3,max=100"`
 	DescImg   string `form:"desc_img" binding:"required,max=255"`
 	Content   string `form:"content" binding:"required"`
-	CreatedBy string `form:"created_by" binding:"required"`
+	CreatedBy string `form:"created_by"`
 }
 
 type DeletePostRequest struct {
@@ -41,7 +41,7 @@ func (svc *Service) GetPostList(param *GetPostListRequest, pager *app.Pager) ([]
 	return svc.dao.GetPostList(pager.Page, pager.PageSize, param.Filter)
 }
 
-func (svc *Service) CreatePost(param *CreatePostRequest) error {
+func (svc *Service) CreatePost(param *CreatePostRequest) *model.Post {
 	desc := ""
 	// 假设这里去掉了图片url
 	//contentTemp := param.Content

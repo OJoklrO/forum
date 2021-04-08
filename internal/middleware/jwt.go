@@ -31,6 +31,7 @@ func JWT() gin.HandlerFunc {
 				}
 			}
 		}
+		c.Set("token", token)
 
 		if ecode != errcode.Success {
 			response := app.NewResponse(c)

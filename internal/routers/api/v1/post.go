@@ -34,7 +34,6 @@ func (p Post) Get(c *gin.Context) {
 	//	response.ToErrorResponse(errRsp)
 	//	return
 	//}
-
 	svc := service.New(c.Request.Context())
 	post, err := svc.GetPost(&param)
 	if err != nil {
@@ -109,15 +108,25 @@ func (p Post) Create(c *gin.Context) {
 		return
 	}
 
-	svc := service.New(c.Request.Context())
-	err := svc.CreatePost(&param)
+	calims, err := app.ParseToken(c.Keys["token"].(string))
 	if err != nil {
+		global.Logger.Errorf("app.ParseToken errs: %v", err)
+		response.ToErrorResponse(errcode.NewError(1213123, "developer is sb"))
+		return
+	}
+	param.CreatedBy = calims.Name
+
+	svc := service.New(c.Request.Context())
+	pos := svc.CreatePost(&param)
+	if pos == nil {
 		global.Logger.Errorf("svc.CreatePost err: %v", err)
 		response.ToErrorResponse(errcode.ErrorCreatePostFail)
 		return
 	}
 
-	response.ToResponse(gin.H{})
+	response.ToResponse(gin.H{
+		"post_id": pos.ID,
+	})
 	return
 }
 
@@ -155,3 +164,46 @@ func (p Post) Delete(c *gin.Context) {
 //func (p Post) Update(c *gin.Context) {
 //
 //}
+
+func (p Post) CreateTemp(c *gin.Context) {
+	param := service.CreatePostRequest{}
+	response := app.NewResponse(c)
+	valid, errs := app.BindAndValid(c, &param)
+	if !valid {
+		global.Logger.Errorf("app.BindAndValid errs: %v", errs)
+		errRsp := errcode.InvalidParams.WithDetails(errs.Errors()...)
+		response.ToErrorResponse(errRsp)
+		return
+	}
+	//calims, err := app.ParseToken(c.Keys["token"].(string))
+	//if err != nil {
+	//	global.Logger.Errorf("app.ParseToken errs: %v", err)
+	//	response.ToErrorResponse(errcode.NewError(1213123, "developer is sb"))
+	//	return
+	//}
+	//param.CreatedBy = calims.Name
+
+	svc := service.New(c.Request.Context())
+	pos := svc.CreatePost(&param)
+	if pos == nil {
+		global.Logger.Errorf("svc.CreatePost err")
+		response.ToErrorResponse(errcode.ErrorCreatePostFail)
+		return
+	}
+
+	pa := service.CreateCommentRequest{}
+	pa.PostID = pos.ID
+	pa.Content = c.PostForm("content")
+	pa.CreatedBy = c.PostForm("created_by")
+
+	if err := svc.CreateComment(&pa); err != nil {
+		global.Logger.Errorf("svc.CreateComment err: %v", err)
+		response.ToErrorResponse(errcode.ErrorCreateCommentFail)
+		return
+	}
+
+	response.ToResponse(gin.H{
+		"post_id": pos.ID,
+	})
+	return
+}

@@ -25,19 +25,16 @@ func NewRouter() *gin.Engine {
 	post := v1.NewPost()
 	comment := v1.NewComment()
 
-	api := r.Group("/api")
-	{
-		api.GET("/auth", v1.GetAuth)
-		api.POST("/auth/operators/create", v1.CreateAuth)
-	}
+	r.GET("/auth", v1.GetAuth)
+	r.POST("/auth/operators/create", v1.CreateAuth)
 
-	apiv1 := api.Group("/v1")
+	apiv1 := r.Group("api/v1")
 	{
-		//apiv1.Use(middleware.JWT())
+		apiv1.Use(middleware.JWT())
 
 		apiv1.GET("/posts", post.List)
 		apiv1.GET("/posts/:id", post.Get)
-		apiv1.POST("/posts", post.Create)
+		apiv1.POST("/posts", post.CreateTemp)
 		apiv1.DELETE("/posts/:id", post.Delete)
 
 		apiv1.GET("/comments/:post_id", comment.List)

@@ -16,7 +16,7 @@ type ListCommentRequest struct {
 type CreateCommentRequest struct {
 	Content string `form:"content" binding:"required"`
 	PostID uint32 `form:"post_id" binding:"required"`
-	CreatedBy string `form:"created_by" binding:"required"`
+	CreatedBy string `form:"created_by"`
 }
 
 type DeleteCommentRequest struct {
