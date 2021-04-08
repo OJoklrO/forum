@@ -26,7 +26,7 @@ func GetAuth(c *gin.Context) {
 		return
 	}
 
-	token, err := app.GenerateToken(param.AppKey, param.AppSecret)
+	token, err := app.GenerateToken(param.Uname, param.Upassword)
 	if err != nil {
 		global.Logger.Errorf("app.GenerateToken err: %v", err)
 		response.ToErrorResponse(errcode.UnauthorizedTokenGenerate)
@@ -36,4 +36,34 @@ func GetAuth(c *gin.Context) {
 	response.ToResponse(gin.H{
 		"token": token,
 	})
+}
+
+// @Summary get add user
+// @Produce json
+// @Param uname query int false "user name"
+// @Param upassword query int false "user password"
+// @Success 200 {object} model.Auth "success"
+// @Failure 400 {object} errcode.Error "request error"
+// @Failure 500 {object} errcode.Error "server error"
+// @Router /api/v1/auth [post]
+func CreateAuth(c *gin.Context) {
+	param := service.CreateAuthRequest{}
+	param.Uname = c.Query("uname")
+	param.Upassword = c.Query("upassword")
+
+	response := app.NewResponse(c)
+
+	svc := service.New(c.Request.Context())
+	if !svc.AuthExist(&service.AuthExistRequest{Uname: param.Uname}) {
+		response.ToErrorResponse(errcode.ErrorAuthExist)
+		return
+	}
+
+	if err := svc.CreateAuth(&param); err != nil {
+		global.Logger.Errorf("svc.CreateAuth err: %v", err)
+		response.ToErrorResponse(errcode.ErrorAuthCreateFail)
+		return
+	}
+
+	response.ToResponse(gin.H{})
 }

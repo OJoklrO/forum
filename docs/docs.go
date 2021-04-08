@@ -24,6 +24,48 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/auth": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "get add user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user name",
+                        "name": "uname",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "user password",
+                        "name": "upassword",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/model.Auth"
+                        }
+                    },
+                    "400": {
+                        "description": "request error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "server error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/comments/": {
             "post": {
                 "produces": [
@@ -369,6 +411,32 @@ var doc = `{
         },
         "errcode.Error": {
             "type": "object"
+        },
+        "model.Auth": {
+            "type": "object",
+            "properties": {
+                "created_by": {
+                    "type": "string"
+                },
+                "created_on": {
+                    "type": "integer"
+                },
+                "deleted_on": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_del": {
+                    "type": "integer"
+                },
+                "uname": {
+                    "type": "string"
+                },
+                "upassword": {
+                    "type": "string"
+                }
+            }
         },
         "model.Comment": {
             "type": "object",

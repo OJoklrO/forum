@@ -9,3 +9,4 @@
 2021/04/08 13:56:06 {"callers":["/home/joklr/GoProgram/forum/main.go: 20 main.init.0"],"level":"error","message":"app.BindAndValid errs: ID为必填字段","time":1617861366563287615}
 2021/04/08 13:56:40 {"callers":["/home/joklr/GoProgram/forum/main.go: 20 main.init.0"],"level":"info","message":"Get id: 1","time":1617861400594608437}
 2021/04/08 14:51:41 {"callers":["/home/joklr/GoProgram/forum/main.go: 20 main.init.0"],"level":"error","message":"app.BindAndValid errs: ","time":1617864701001866771}
+2021/04/08 16:57:34 {"callers":["/home/joklr/GoProgram/forum/main.go: 20 main.init.0"],"level":"error","message":"svc.CreateAuth err: Error 1054: Unknown column 'u_name' in 'field list'","time":1617872254769826997}
