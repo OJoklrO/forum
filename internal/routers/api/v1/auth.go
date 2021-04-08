@@ -8,6 +8,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Token struct {
+	Token string
+}
+
+// @Summary auth and get token
+// @Produce json
+// @Param uname query int false "user name"
+// @Param upassword query int false "user password"
+// @Success 200 {object} Token "success"
+// @Failure 400 {object} errcode.Error "request error"
+// @Failure 500 {object} errcode.Error "server error"
+// @Router /auth [get]
 func GetAuth(c *gin.Context) {
 	param := service.AuthRequest{}
 	response := app.NewResponse(c)
@@ -35,6 +47,7 @@ func GetAuth(c *gin.Context) {
 
 	response.ToResponse(gin.H{
 		"token": token,
+		"uname": param.Uname,
 	})
 }
 
@@ -45,7 +58,7 @@ func GetAuth(c *gin.Context) {
 // @Success 200 {object} model.Auth "success"
 // @Failure 400 {object} errcode.Error "request error"
 // @Failure 500 {object} errcode.Error "server error"
-// @Router /api/v1/auth [post]
+// @Router /auth [post]
 func CreateAuth(c *gin.Context) {
 	param := service.CreateAuthRequest{}
 	param.Uname = c.Query("uname")

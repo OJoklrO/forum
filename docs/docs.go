@@ -24,48 +24,6 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/auth": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "get add user",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "user name",
-                        "name": "uname",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "user password",
-                        "name": "upassword",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "schema": {
-                            "$ref": "#/definitions/model.Auth"
-                        }
-                    },
-                    "400": {
-                        "description": "request error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "server error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
-                        }
-                    }
-                }
-            }
-        },
         "/api/v1/comments/": {
             "post": {
                 "produces": [
@@ -392,6 +350,88 @@ var doc = `{
                     }
                 }
             }
+        },
+        "/auth": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "auth and get token",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user name",
+                        "name": "uname",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "user password",
+                        "name": "upassword",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Token"
+                        }
+                    },
+                    "400": {
+                        "description": "request error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "server error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "get add user",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "user name",
+                        "name": "uname",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "user password",
+                        "name": "upassword",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/model.Auth"
+                        }
+                    },
+                    "400": {
+                        "description": "request error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "server error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -430,10 +470,10 @@ var doc = `{
                 "is_del": {
                     "type": "integer"
                 },
-                "uname": {
+                "name": {
                     "type": "string"
                 },
-                "upassword": {
+                "password": {
                     "type": "string"
                 }
             }
@@ -533,6 +573,14 @@ var doc = `{
                 },
                 "pager": {
                     "$ref": "#/definitions/app.Pager"
+                }
+            }
+        },
+        "v1.Token": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
                 }
             }
         }

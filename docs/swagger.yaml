@@ -22,9 +22,9 @@ definitions:
         type: integer
       is_del:
         type: integer
-      uname:
+      name:
         type: string
-      upassword:
+      password:
         type: string
     type: object
   model.Comment:
@@ -91,39 +91,17 @@ definitions:
       pager:
         $ref: '#/definitions/app.Pager'
     type: object
+  v1.Token:
+    properties:
+      token:
+        type: string
+    type: object
 info:
   contact: {}
   description: student forum api
   title: forum
   version: "1.0"
 paths:
-  /api/v1/auth:
-    post:
-      parameters:
-      - description: user name
-        in: query
-        name: uname
-        type: integer
-      - description: user password
-        in: query
-        name: upassword
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: success
-          schema:
-            $ref: '#/definitions/model.Auth'
-        "400":
-          description: request error
-          schema:
-            $ref: '#/definitions/errcode.Error'
-        "500":
-          description: server error
-          schema:
-            $ref: '#/definitions/errcode.Error'
-      summary: get add user
   /api/v1/comments/:
     post:
       parameters:
@@ -337,4 +315,57 @@ paths:
           schema:
             $ref: '#/definitions/errcode.Error'
       summary: get post by id
+  /auth:
+    get:
+      parameters:
+      - description: user name
+        in: query
+        name: uname
+        type: integer
+      - description: user password
+        in: query
+        name: upassword
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/v1.Token'
+        "400":
+          description: request error
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: server error
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: auth and get token
+    post:
+      parameters:
+      - description: user name
+        in: query
+        name: uname
+        type: integer
+      - description: user password
+        in: query
+        name: upassword
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Auth'
+        "400":
+          description: request error
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: server error
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: get add user
 swagger: "2.0"
