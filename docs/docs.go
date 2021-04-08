@@ -24,56 +24,7 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/comments": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "get comment list with post id",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "post id",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page size",
-                        "name": "page_size",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "schema": {
-                            "$ref": "#/definitions/model.Comment"
-                        }
-                    },
-                    "400": {
-                        "description": "request error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "server error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/comments/create": {
+        "/api/v1/comments/": {
             "post": {
                 "produces": [
                     "application/json"
@@ -97,40 +48,10 @@ var doc = `{
                         "schema": {
                             "type": "integer"
                         }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "schema": {
-                            "$ref": "#/definitions/model.Comment"
-                        }
                     },
-                    "400": {
-                        "description": "request error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "server error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/comments/delete": {
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "delete comment need adm cookie",
-                "parameters": [
                     {
-                        "description": "comment id",
-                        "name": "id",
+                        "description": "post id",
+                        "name": "post_id",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -161,11 +82,11 @@ var doc = `{
             }
         },
         "/api/v1/comments/{id}": {
-            "get": {
+            "delete": {
                 "produces": [
                     "application/json"
                 ],
-                "summary": "get comment by id",
+                "summary": "delete comment need adm cookie",
                 "parameters": [
                     {
                         "type": "integer",
@@ -180,6 +101,55 @@ var doc = `{
                         "description": "success",
                         "schema": {
                             "$ref": "#/definitions/model.Comment"
+                        }
+                    },
+                    "400": {
+                        "description": "request error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "server error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/comments/{post_id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "get comment list with post id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "post id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size",
+                        "name": "page_size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/model.CommentSwagger"
                         }
                     },
                     "400": {
@@ -426,6 +396,23 @@ var doc = `{
                 },
                 "is_del": {
                     "type": "integer"
+                },
+                "post_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.CommentSwagger": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Comment"
+                    }
+                },
+                "pager": {
+                    "$ref": "#/definitions/app.Pager"
                 }
             }
         },

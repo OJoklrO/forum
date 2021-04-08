@@ -31,11 +31,9 @@ func NewRouter() *gin.Engine {
 		apiv1.POST("/posts", post.Create)
 		apiv1.DELETE("/posts/:id", post.Delete)
 
-		c := apiv1.Group("/comments")
-		c.GET("/", comment.List)
-		c.GET("/:id", comment.Get)
-		c.POST("/create", comment.Create)
-		c.POST("/delete", comment.Delete)
+		apiv1.GET("/comments/:post_id", comment.List)
+		apiv1.POST("/comments", comment.Create)
+		apiv1.DELETE("/comments/:id", comment.Delete)
 	}
 
 
