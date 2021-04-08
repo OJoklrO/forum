@@ -1,0 +1,10 @@
+2021/04/08 13:36:43 {"callers":["/home/joklr/GoProgram/forum/main.go: 20 main.init.0"],"level":"error","message":"app.BindAndValid errs: ","time":1617860203995173653}
+2021/04/08 13:38:56 {"callers":["/home/joklr/GoProgram/forum/main.go: 20 main.init.0"],"level":"error","message":"app.BindAndValid errs: ","time":1617860336399867702}
+2021/04/08 13:44:04 {"callers":["/home/joklr/GoProgram/forum/main.go: 20 main.init.0"],"level":"error","message":"svc.CreatePost err: Error 1054: Unknown column 'create_on' in 'field list'","time":1617860644864634156}
+2021/04/08 13:53:13 {"callers":["/home/joklr/GoProgram/forum/main.go: 20 main.init.0"],"level":"error","message":"app.BindAndValid errs: ID为必填字段","time":1617861193721156520}
+2021/04/08 13:53:38 {"callers":["/home/joklr/GoProgram/forum/main.go: 20 main.init.0"],"level":"error","message":"app.BindAndValid errs: ID为必填字段","time":1617861218117530754}
+2021/04/08 13:55:02 {"callers":["/home/joklr/GoProgram/forum/main.go: 20 main.init.0"],"level":"error","message":"app.BindAndValid errs: ID为必填字段","time":1617861302548969663}
+2021/04/08 13:55:03 {"callers":["/home/joklr/GoProgram/forum/main.go: 20 main.init.0"],"level":"error","message":"app.BindAndValid errs: ID为必填字段","time":1617861303581599940}
+2021/04/08 13:56:06 {"callers":["/home/joklr/GoProgram/forum/main.go: 20 main.init.0"],"level":"info","message":"Get id: 1","time":1617861366562995980}
+2021/04/08 13:56:06 {"callers":["/home/joklr/GoProgram/forum/main.go: 20 main.init.0"],"level":"error","message":"app.BindAndValid errs: ID为必填字段","time":1617861366563287615}
+2021/04/08 13:56:40 {"callers":["/home/joklr/GoProgram/forum/main.go: 20 main.init.0"],"level":"info","message":"Get id: 1","time":1617861400594608437}
