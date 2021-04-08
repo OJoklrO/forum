@@ -26,6 +26,8 @@ func NewRouter() *gin.Engine {
 	comment := v1.NewComment()
 	apiv1 := r.Group("/api/v1")
 	{
+		apiv1.GET("/auth", v1.GetAuth)
+
 		apiv1.GET("/posts", post.List)
 		apiv1.GET("/posts/:id", post.Get)
 		apiv1.POST("/posts", post.Create)
