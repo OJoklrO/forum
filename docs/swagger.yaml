@@ -1,0 +1,304 @@
+definitions:
+  app.Pager:
+    properties:
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total_size:
+        type: integer
+    type: object
+  errcode.Error:
+    type: object
+  model.Comment:
+    properties:
+      agree:
+        type: integer
+      content:
+        type: string
+      created_by:
+        type: string
+      created_on:
+        type: integer
+      deleted_on:
+        type: integer
+      disagree:
+        type: integer
+      id:
+        type: integer
+      is_del:
+        type: integer
+    type: object
+  model.Post:
+    properties:
+      agree:
+        type: integer
+      content:
+        type: string
+      created_by:
+        type: string
+      created_on:
+        type: integer
+      deleted_on:
+        type: integer
+      desc:
+        type: string
+      desc_img:
+        type: string
+      disagree:
+        type: integer
+      id:
+        type: integer
+      is_del:
+        type: integer
+      title:
+        type: string
+    type: object
+  model.PostSwagger:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/model.Post'
+        type: array
+      pager:
+        $ref: '#/definitions/app.Pager'
+    type: object
+info:
+  contact: {}
+  description: student forum api
+  title: forum
+  version: "1.0"
+paths:
+  /api/v1/comments:
+    get:
+      parameters:
+      - description: post id
+        in: query
+        name: id
+        required: true
+        type: integer
+      - description: page number
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Comment'
+        "400":
+          description: request error
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: server error
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: get comment list with post id
+  /api/v1/comments/{id}:
+    get:
+      parameters:
+      - description: comment id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Comment'
+        "400":
+          description: request error
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: server error
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: get comment by id
+  /api/v1/comments/create:
+    post:
+      parameters:
+      - description: comment content
+        in: body
+        name: content
+        required: true
+        schema:
+          type: string
+      - description: creator id
+        in: body
+        name: created_by
+        required: true
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Comment'
+        "400":
+          description: request error
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: server error
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: create comment
+  /api/v1/comments/delete:
+    post:
+      parameters:
+      - description: comment id
+        in: body
+        name: id
+        required: true
+        schema:
+          type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Comment'
+        "400":
+          description: request error
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: server error
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: delete comment need adm cookie
+  /api/v1/posts:
+    get:
+      parameters:
+      - description: page number
+        in: query
+        name: page
+        type: integer
+      - description: page size
+        in: query
+        name: page_size
+        type: integer
+      - description: filter
+        in: query
+        name: filter
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/model.PostSwagger'
+        "400":
+          description: request error
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: server error
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: get post list
+    post:
+      parameters:
+      - description: post title
+        in: body
+        name: title
+        required: true
+        schema:
+          type: string
+      - description: desc image url
+        in: body
+        name: desc_img
+        required: true
+        schema:
+          type: string
+      - description: creator
+        in: body
+        name: created_by
+        required: true
+        schema:
+          type: string
+      - description: post content
+        in: body
+        name: content
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Post'
+        "400":
+          description: request error
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: server error
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: create post
+  /api/v1/posts/{id}:
+    delete:
+      parameters:
+      - description: post id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Post'
+        "400":
+          description: request error
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: server error
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: delete post need adm cookie
+    get:
+      parameters:
+      - description: post id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/model.Post'
+        "400":
+          description: request error
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: server error
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: get post by id
+swagger: "2.0"

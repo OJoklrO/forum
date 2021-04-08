@@ -1,0 +1,468 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "student forum api",
+        "title": "forum",
+        "contact": {},
+        "version": "1.0"
+    },
+    "paths": {
+        "/api/v1/comments": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "get comment list with post id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "post id",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size",
+                        "name": "page_size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/model.Comment"
+                        }
+                    },
+                    "400": {
+                        "description": "request error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "server error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/comments/create": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "create comment",
+                "parameters": [
+                    {
+                        "description": "comment content",
+                        "name": "content",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "creator id",
+                        "name": "created_by",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/model.Comment"
+                        }
+                    },
+                    "400": {
+                        "description": "request error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "server error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/comments/delete": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "delete comment need adm cookie",
+                "parameters": [
+                    {
+                        "description": "comment id",
+                        "name": "id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/model.Comment"
+                        }
+                    },
+                    "400": {
+                        "description": "request error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "server error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/comments/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "get comment by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "comment id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/model.Comment"
+                        }
+                    },
+                    "400": {
+                        "description": "request error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "server error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/posts": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "get post list",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "filter",
+                        "name": "filter",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/model.PostSwagger"
+                        }
+                    },
+                    "400": {
+                        "description": "request error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "server error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "create post",
+                "parameters": [
+                    {
+                        "description": "post title",
+                        "name": "title",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "desc image url",
+                        "name": "desc_img",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "creator",
+                        "name": "created_by",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "post content",
+                        "name": "content",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/model.Post"
+                        }
+                    },
+                    "400": {
+                        "description": "request error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "server error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/posts/{id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "get post by id",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "post id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/model.Post"
+                        }
+                    },
+                    "400": {
+                        "description": "request error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "server error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "delete post need adm cookie",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "post id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/model.Post"
+                        }
+                    },
+                    "400": {
+                        "description": "request error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "server error",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "app.Pager": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "total_size": {
+                    "type": "integer"
+                }
+            }
+        },
+        "errcode.Error": {
+            "type": "object"
+        },
+        "model.Comment": {
+            "type": "object",
+            "properties": {
+                "agree": {
+                    "type": "integer"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "string"
+                },
+                "created_on": {
+                    "type": "integer"
+                },
+                "deleted_on": {
+                    "type": "integer"
+                },
+                "disagree": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_del": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.Post": {
+            "type": "object",
+            "properties": {
+                "agree": {
+                    "type": "integer"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "string"
+                },
+                "created_on": {
+                    "type": "integer"
+                },
+                "deleted_on": {
+                    "type": "integer"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "desc_img": {
+                    "type": "string"
+                },
+                "disagree": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_del": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.PostSwagger": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Post"
+                    }
+                },
+                "pager": {
+                    "$ref": "#/definitions/app.Pager"
+                }
+            }
+        }
+    }
+}
