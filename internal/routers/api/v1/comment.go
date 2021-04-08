@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"fmt"
 	"github.com/OJoklrO/forum/global"
 	"github.com/OJoklrO/forum/internal/service"
 	"github.com/OJoklrO/forum/pkg/app"
@@ -59,8 +60,8 @@ func (c Comment) List(ctx *gin.Context) {
 // @Summary create comment
 // @Produce json
 // @Param content body string true "comment content"
-// @Param created_by body int true "creator id"
-// @Param post_id body int true "post id"
+// @Param createdby body int true "creator id"
+// @Param postid body int true "post id"
 // @Success 200 {object} model.Comment "success"
 // @Failure 400 {object} errcode.Error "request error"
 // @Failure 500 {object} errcode.Error "server error"
@@ -68,13 +69,20 @@ func (c Comment) List(ctx *gin.Context) {
 func (c Comment) Create(ctx *gin.Context) {
 	param := service.CreateCommentRequest{}
 	response := app.NewResponse(ctx)
-	valid, errs := app.BindAndValid(ctx, &param)
-	if !valid {
-		global.Logger.Errorf("app.BindAndValid errs: %v", errs)
-		errRsp := errcode.InvalidParams.WithDetails(errs.Errors()...)
-		response.ToErrorResponse(errRsp)
-		return
-	}
+	//valid, errs := app.BindAndValid(ctx, &param)
+	//if !valid {
+	//	global.Logger.Errorf("app.BindAndValid errs: %v", errs)
+	//	errRsp := errcode.InvalidParams.WithDetails(errs.Errors()...)
+	//	response.ToErrorResponse(errRsp)
+	//	return
+	//}
+	a := make(map[string]interface{})
+	_ = ctx.BindJSON(&a)
+	fmt.Println(a)
+
+	param.PostID = convert.StrTo(a["postid"].(string)).MustUInt32()
+	param.Content = a["content"].(string)
+	param.CreatedBy = a["createdby"].(string)
 
 	svc := service.New(ctx.Request.Context())
 	err := svc.CreateComment(&param)

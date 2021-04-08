@@ -33,7 +33,7 @@ func init() {
 func main() {
 	router := routers.NewRouter()
 	s := http.Server{
-		Addr: ":8080",
+		Addr: ":" + global.ServerSetting.HttpPort,
 		Handler: router,
 	}
 	log.Fatal(s.ListenAndServe())

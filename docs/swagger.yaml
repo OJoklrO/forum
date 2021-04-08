@@ -113,13 +113,13 @@ paths:
           type: string
       - description: creator id
         in: body
-        name: created_by
+        name: createdby
         required: true
         schema:
           type: integer
       - description: post id
         in: body
-        name: post_id
+        name: postid
         required: true
         schema:
           type: integer
@@ -242,7 +242,7 @@ paths:
           type: string
       - description: creator
         in: body
-        name: created_by
+        name: createdby
         required: true
         schema:
           type: string

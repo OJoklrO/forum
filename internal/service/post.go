@@ -19,10 +19,10 @@ type GetPostListRequest struct {
 }
 
 type CreatePostRequest struct {
-	Title     string `form:"title" binding:"required,min=3,max=100"`
-	DescImg   string `form:"desc_img" binding:"required,max=255"`
+	Title     string `form:"title" binding:"required,max=100"`
+	DescImg   string `form:"desc_img" binding:"max=255"`
 	Content   string `form:"content" binding:"required"`
-	CreatedBy string `form:"created_by"`
+	CreatedBy string `form:"createdby"`
 }
 
 type DeletePostRequest struct {

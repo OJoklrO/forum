@@ -14,9 +14,9 @@ type ListCommentRequest struct {
 }
 
 type CreateCommentRequest struct {
-	Content string `form:"content" binding:"required"`
-	PostID uint32 `form:"post_id" binding:"required"`
-	CreatedBy string `form:"created_by"`
+	Content string `form:"content"`
+	PostID uint32 `form:"postid" binding:"required"`
+	CreatedBy string `form:"createdby"`
 }
 
 type DeleteCommentRequest struct {

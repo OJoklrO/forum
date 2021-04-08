@@ -16,6 +16,7 @@ type AppSettings struct {
 	LogSavePath         string
 	LogFileName         string
 	LogFileExt          string
+	StaticPagePath      string
 }
 
 type DatabaseSettings struct {

@@ -42,7 +42,7 @@ var doc = `{
                     },
                     {
                         "description": "creator id",
-                        "name": "created_by",
+                        "name": "createdby",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -51,7 +51,7 @@ var doc = `{
                     },
                     {
                         "description": "post id",
-                        "name": "post_id",
+                        "name": "postid",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -240,7 +240,7 @@ var doc = `{
                     },
                     {
                         "description": "creator",
-                        "name": "created_by",
+                        "name": "createdby",
                         "in": "body",
                         "required": true,
                         "schema": {

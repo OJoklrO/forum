@@ -27,7 +27,6 @@ func (p Post) Get(c *gin.Context) {
 	response := app.NewResponse(c)
 	//valid, errs := app.BindAndValid(c, &param)
 	param.ID = convert.StrTo(c.Param("id")).MustUInt32()
-	global.Logger.Infof("Get id: %d", param.ID)
 	//if !valid {
 	//	global.Logger.Errorf("app.BindAndValid errs: %v", errs)
 	//	errRsp := errcode.InvalidParams.WithDetails(errs.Errors()...)
@@ -91,7 +90,7 @@ func (p Post) List(c *gin.Context) {
 // @Produce json
 // @Param title body string true "post title"
 // @Param desc_img body string true "desc image url"
-// @Param created_by body string true "creator"
+// @Param createdby body string true "creator"
 // @Param content body string true "post content"
 // @Success 200 {object} model.Post "success"
 // @Failure 400 {object} errcode.Error "request error"
@@ -193,8 +192,8 @@ func (p Post) CreateTemp(c *gin.Context) {
 
 	pa := service.CreateCommentRequest{}
 	pa.PostID = pos.ID
-	pa.Content = c.PostForm("content")
-	pa.CreatedBy = c.PostForm("created_by")
+	pa.Content = param.Content
+	pa.CreatedBy = param.CreatedBy
 
 	if err := svc.CreateComment(&pa); err != nil {
 		global.Logger.Errorf("svc.CreateComment err: %v", err)
