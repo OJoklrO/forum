@@ -4,6 +4,7 @@ import (
 	"github.com/OJoklrO/forum/global"
 	"github.com/OJoklrO/forum/internal/service"
 	"github.com/OJoklrO/forum/pkg/app"
+	"github.com/OJoklrO/forum/pkg/convert"
 	"github.com/OJoklrO/forum/pkg/errcode"
 	"github.com/gin-gonic/gin"
 )
@@ -24,13 +25,15 @@ func NewPost() Post {
 func (p Post) Get(c *gin.Context) {
 	param := service.GetPostRequest{}
 	response := app.NewResponse(c)
-	valid, errs := app.BindAndValid(c, &param)
-	if !valid {
-		global.Logger.Errorf("app.BindAndValid errs: %v", errs)
-		errRsp := errcode.InvalidParams.WithDetails(errs.Errors()...)
-		response.ToErrorResponse(errRsp)
-		return
-	}
+	//valid, errs := app.BindAndValid(c, &param)
+	param.ID = convert.StrTo(c.Param("id")).MustUInt32()
+	global.Logger.Infof("Get id: %d", param.ID)
+	//if !valid {
+	//	global.Logger.Errorf("app.BindAndValid errs: %v", errs)
+	//	errRsp := errcode.InvalidParams.WithDetails(errs.Errors()...)
+	//	response.ToErrorResponse(errRsp)
+	//	return
+	//}
 
 	svc := service.New(c.Request.Context())
 	post, err := svc.GetPost(&param)
@@ -96,7 +99,26 @@ func (p Post) List(c *gin.Context) {
 // @Failure 500 {object} errcode.Error "server error"
 // @Router /api/v1/posts [post]
 func (p Post) Create(c *gin.Context) {
+	param := service.CreatePostRequest{}
+	response := app.NewResponse(c)
+	valid, errs := app.BindAndValid(c, &param)
+	if !valid {
+		global.Logger.Errorf("app.BindAndValid errs: %v", errs)
+		errRsp := errcode.InvalidParams.WithDetails(errs.Errors()...)
+		response.ToErrorResponse(errRsp)
+		return
+	}
 
+	svc := service.New(c.Request.Context())
+	err := svc.CreatePost(&param)
+	if err != nil {
+		global.Logger.Errorf("svc.CreatePost err: %v", err)
+		response.ToErrorResponse(errcode.ErrorCreatePostFail)
+		return
+	}
+
+	response.ToResponse(gin.H{})
+	return
 }
 
 // @Summary delete post need adm cookie
@@ -107,7 +129,27 @@ func (p Post) Create(c *gin.Context) {
 // @Failure 500 {object} errcode.Error "server error"
 // @Router /api/v1/posts/{id} [delete]
 func (p Post) Delete(c *gin.Context) {
+	param := service.DeletePostRequest{}
+	response := app.NewResponse(c)
+	param.ID = convert.StrTo(c.Param("id")).MustUInt32()
+	//valid, errs := app.BindAndValid(c, &param)
+	//if !valid {
+	//	global.Logger.Errorf("app.BindAndValid errs: %v", errs)
+	//	errRsp := errcode.InvalidParams.WithDetails(errs.Errors()...)
+	//	response.ToErrorResponse(errRsp)
+	//	return
+	//}
 
+	svc := service.New(c.Request.Context())
+	err := svc.DeletePost(&param)
+	if err != nil {
+		global.Logger.Errorf("svc.DeletePost err: %v", err)
+		response.ToErrorResponse(errcode.ErrorDeletePostFail)
+		return
+	}
+
+	response.ToResponse(gin.H{})
+	return
 }
 
 //func (p Post) Update(c *gin.Context) {
