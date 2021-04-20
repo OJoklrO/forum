@@ -1,2 +1,4 @@
-config/config.yaml
-storage/logs/app.log
+/.idea
+/config
+/storage
+./forum
