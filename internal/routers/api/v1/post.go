@@ -125,7 +125,7 @@ func (p Post) Create(c *gin.Context) {
 	})
 }
 
-// @Summary delete post need adm cookie
+// @Summary Delete a post.
 // @Produce json
 // @Param id path int true "post id"
 // @Success 200 {object} model.Post "success"

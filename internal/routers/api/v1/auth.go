@@ -44,7 +44,7 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, LoginResponse{token})
 }
 
-// @Summary Register
+// @Summary Register.
 // @Produce json
 // @Param body body service.RegisterRequest true "body"
 // @Success 200 {object} MessageResponse "success"
@@ -67,7 +67,7 @@ func Register(c *gin.Context) {
 	c.JSON(http.StatusOK, MessageResponse{"success."})
 }
 
-// @Summary Delete account
+// @Summary Delete an account.
 // @Produce json
 // @Param id path string true "id"
 // @Success 200 {object} MessageResponse "success"
