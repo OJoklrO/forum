@@ -28,33 +28,28 @@ func NewRouter() *gin.Engine {
 	//r.Use(cors.New(config))
 
 	r.Use(static.Serve("/", static.LocalFile(global.AppSetting.StaticPagePath + "/", false)))
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "pong",
-		})
-	})
 
 	// swagger ui
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-
-	r.GET("/auth", v1.GetAuth)
-	r.POST("/auth/operators/create", v1.CreateAuth)
-
-	apiv1 := r.Group("api/v1")
+	apiV1 := r.Group("api/v1")
 	{
+		r.POST("/account/login", v1.Login)
+		r.POST("/account/register", v1.Register)
+		r.DELETE("/account/delete/:id", v1.DeleteAccount)
+
 		// todo: jwt
-		//apiv1.Use(middleware.JWT())
+		//apiV1.Use(middleware.JWT())
 		post := v1.NewPost()
-		apiv1.GET("/posts", post.List)
-		apiv1.GET("/posts/:id", post.Get)
-		apiv1.POST("/posts", post.Create)
-		apiv1.DELETE("/posts/:id", post.Delete)
+		apiV1.GET("/posts", post.List)
+		apiV1.GET("/posts/:id", post.Get)
+		apiV1.POST("/posts", post.Create)
+		apiV1.DELETE("/posts/:id", post.Delete)
 
 		comment := v1.NewComment()
-		apiv1.GET("/comments/:post_id", comment.List)
-		apiv1.POST("/comments", comment.Create)
-		apiv1.DELETE("/comments/:id", comment.Delete)
+		apiV1.GET("/comments/:post_id", comment.List)
+		apiV1.POST("/comments", comment.Create)
+		apiV1.DELETE("/comments/:id", comment.Delete)
 	}
 
 	return r

@@ -18,7 +18,7 @@ func NewComment() Comment {
 	return Comment{}
 }
 
-//func (c Comment) Get(ctx *gin.Context) {
+//func (c Comment) Check(ctx *gin.Context) {
 //
 //}
 

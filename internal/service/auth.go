@@ -1,49 +1,49 @@
 package service
 
-import "errors"
+import (
+	"errors"
+	"github.com/OJoklrO/forum/internal/model"
+)
 
-type AuthRequest struct {
-	Uname    string `form:"uname" binding:"required"`
-	Upassword string `form:"upassword" binding:"required"`
+type LoginRequest struct {
+	ID       string `form:"id" binding:"required"`
+	Password string `form:"password" binding:"required"`
 }
 
-type CreateAuthRequest struct {
-	Uname    string `form:"uname" binding:"required"`
-	Upassword string `form:"upassword" binding:"required"`
+func (svc *Service) LoginAccount(param *LoginRequest) error {
+	account := model.Account{ID: param.ID, Password: param.Password}
+	return account.Check(svc.db)
 }
 
-type DeleteAuthRequest struct {
-	ID uint32 `form:"id" binding:"required"`
+type RegisterRequest struct {
+	ID       string `form:"id" binding:"required"`
+	Password string `form:"password" binding:"required"`
 }
 
-type AuthExistRequest struct {
-	Uname string
-}
-
-func (svc *Service) CheckAuth(param *AuthRequest) error {
-	auth, err := svc.dao.GetAuth(
-		param.Uname,
-		param.Upassword,
-	)
+func (svc *Service) RegisterAccount(param *RegisterRequest) error {
+	account := model.Account{ID: param.ID}
+	exist, err := account.Exist(svc.db)
 	if err != nil {
 		return err
 	}
-
-	if auth.ID > 0 {
-		return nil
+	if exist {
+		return errors.New("the id is not available")
 	}
 
-	return errors.New("auth info does not exist.")
+	auth := model.Account{
+		ID:       param.ID,
+		Password: param.Password,
+	}
+	return auth.Create(svc.db)
 }
 
-func (svc *Service) CreateAuth(param *CreateAuthRequest) error {
-	return svc.dao.CreateAuth(param.Uname, param.Upassword)
+type DeleteAccountRequest struct {
+	ID string `form:"id" binding:"required"`
 }
 
-func (svc *Service) DeleteAuth(param *DeleteAuthRequest) error {
-	return svc.dao.DeleteAuth(param.ID)
-}
-
-func (svc *Service) AuthExist(param *AuthExistRequest) bool {
-	return svc.dao.AuthExist(param.Uname)
+func (svc *Service) DeleteAccount(param *DeleteAccountRequest) error {
+	auth := model.Account{
+		ID: param.ID,
+	}
+	return auth.Delete(svc.db)
 }

@@ -35,7 +35,7 @@ func (p Post) Get(c *gin.Context) {
 	post, err := svc.GetPost(&param)
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
-			"svc.GetPost error "+err.Error())
+			"svc.Get error "+err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, post)
@@ -108,7 +108,7 @@ func (p Post) Create(c *gin.Context) {
 	//	response.ToErrorResponse(errcode.NewError(1213123, "developer is sb"))
 	//	return
 	//}
-	//param.UserID = convert.StrTo(calims.Name).MustUInt32()
+	//param.UserID = convert.StrTo(calims.ID).MustUInt32()
 
 	// todo: apply content to comments(create post)
 

@@ -4,27 +4,25 @@ import (
 	"time"
 
 	"github.com/OJoklrO/forum/global"
-	"github.com/OJoklrO/forum/pkg/util"
 	"github.com/dgrijalva/jwt-go"
 )
 
 type Claims struct {
-	Name     string `json:"name"`
-	Password string `json:"password"`
 	jwt.StandardClaims
+	Name string `json:"name"`
 }
 
 func GetJWTSecret() []byte {
 	return []byte(global.JWTSetting.Secret)
 }
 
-func GenerateToken(name, password string) (string, error) {
+func GenerateJWTToken(id, name string) (string, error) {
 	nowTime := time.Now()
 	expireTime := nowTime.Add(global.JWTSetting.Expire)
 	claims := Claims{
-		Name:     util.EncodeMD5(name),
-		Password: util.EncodeMD5(password),
+		Name: name,
 		StandardClaims: jwt.StandardClaims{
+			Subject:   id,
 			ExpiresAt: expireTime.Unix(),
 			Issuer:    global.JWTSetting.Issuer,
 		},

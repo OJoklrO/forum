@@ -10,23 +10,6 @@ definitions:
     type: object
   errcode.Error:
     type: object
-  model.Auth:
-    properties:
-      created_by:
-        type: string
-      created_on:
-        type: integer
-      deleted_on:
-        type: integer
-      id:
-        type: integer
-      is_del:
-        type: integer
-      name:
-        type: string
-      password:
-        type: string
-    type: object
   model.Comment:
     properties:
       agree:
@@ -78,6 +61,36 @@ definitions:
     - title
     - user_id
     type: object
+  service.LoginRequest:
+    properties:
+      id:
+        type: string
+      password:
+        type: string
+    required:
+    - id
+    - password
+    type: object
+  service.RegisterRequest:
+    properties:
+      id:
+        type: string
+      password:
+        type: string
+    required:
+    - id
+    - password
+    type: object
+  v1.LoginResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  v1.MessageResponse:
+    properties:
+      msg:
+        type: string
+    type: object
   v1.PostCreateResponse:
     properties:
       post_id:
@@ -92,16 +105,61 @@ definitions:
       total_pages:
         type: integer
     type: object
-  v1.Token:
-    properties:
-      token:
-        type: string
-    type: object
 info:
   contact: {}
   title: forum
   version: "0.01"
 paths:
+  /account/delete/{id}:
+    delete:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/v1.MessageResponse'
+      summary: Delete account
+  /account/login:
+    post:
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/service.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/v1.LoginResponse'
+      summary: Log in.
+  /account/register:
+    post:
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/service.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            $ref: '#/definitions/v1.MessageResponse'
+      summary: Register
   /api/v1/comments/:
     post:
       parameters:
@@ -263,57 +321,4 @@ paths:
           schema:
             $ref: '#/definitions/model.Post'
       summary: Get a post by id
-  /auth:
-    get:
-      parameters:
-      - description: user name
-        in: query
-        name: uname
-        type: integer
-      - description: user password
-        in: query
-        name: upassword
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: success
-          schema:
-            $ref: '#/definitions/v1.Token'
-        "400":
-          description: request error
-          schema:
-            $ref: '#/definitions/errcode.Error'
-        "500":
-          description: server error
-          schema:
-            $ref: '#/definitions/errcode.Error'
-      summary: auth and get token
-    post:
-      parameters:
-      - description: user name
-        in: query
-        name: uname
-        type: integer
-      - description: user password
-        in: query
-        name: upassword
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: success
-          schema:
-            $ref: '#/definitions/model.Auth'
-        "400":
-          description: request error
-          schema:
-            $ref: '#/definitions/errcode.Error'
-        "500":
-          description: server error
-          schema:
-            $ref: '#/definitions/errcode.Error'
-      summary: get add user
 swagger: "2.0"

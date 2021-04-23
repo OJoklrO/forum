@@ -24,6 +24,85 @@ var doc = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/account/delete/{id}": {
+            "delete": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Delete account",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/v1.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/account/login": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Log in.",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/v1.LoginResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/account/register": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Register",
+                "parameters": [
+                    {
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/service.RegisterRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/v1.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/comments/": {
             "post": {
                 "produces": [
@@ -271,88 +350,6 @@ var doc = `{
                     }
                 }
             }
-        },
-        "/auth": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "auth and get token",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "user name",
-                        "name": "uname",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "user password",
-                        "name": "upassword",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Token"
-                        }
-                    },
-                    "400": {
-                        "description": "request error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "server error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
-                        }
-                    }
-                }
-            },
-            "post": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "get add user",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "user name",
-                        "name": "uname",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "user password",
-                        "name": "upassword",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "schema": {
-                            "$ref": "#/definitions/model.Auth"
-                        }
-                    },
-                    "400": {
-                        "description": "request error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "server error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -372,32 +369,6 @@ var doc = `{
         },
         "errcode.Error": {
             "type": "object"
-        },
-        "model.Auth": {
-            "type": "object",
-            "properties": {
-                "created_by": {
-                    "type": "string"
-                },
-                "created_on": {
-                    "type": "integer"
-                },
-                "deleted_on": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "is_del": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
         },
         "model.Comment": {
             "type": "object",
@@ -477,6 +448,52 @@ var doc = `{
                 }
             }
         },
+        "service.LoginRequest": {
+            "type": "object",
+            "required": [
+                "id",
+                "password"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "service.RegisterRequest": {
+            "type": "object",
+            "required": [
+                "id",
+                "password"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.MessageResponse": {
+            "type": "object",
+            "properties": {
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
         "v1.PostCreateResponse": {
             "type": "object",
             "properties": {
@@ -496,14 +513,6 @@ var doc = `{
                 },
                 "total_pages": {
                     "type": "integer"
-                }
-            }
-        },
-        "v1.Token": {
-            "type": "object",
-            "properties": {
-                "token": {
-                    "type": "string"
                 }
             }
         }

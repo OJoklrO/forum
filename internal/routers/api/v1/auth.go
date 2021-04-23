@@ -1,82 +1,86 @@
 package v1
 
 import (
-	"github.com/OJoklrO/forum/global"
 	"github.com/OJoklrO/forum/internal/service"
 	"github.com/OJoklrO/forum/pkg/app"
-	"github.com/OJoklrO/forum/pkg/errcode"
 	"github.com/gin-gonic/gin"
+	"net/http"
+	"strings"
 )
 
-type Token struct {
-	Token string
+type LoginResponse struct {
+	Token string `json:"token"`
 }
 
-// @Summary auth and get token
+// @Summary Log in.
 // @Produce json
-// @Param uname query int false "user name"
-// @Param upassword query int false "user password"
-// @Success 200 {object} Token "success"
-// @Failure 400 {object} errcode.Error "request error"
-// @Failure 500 {object} errcode.Error "server error"
-// @Router /auth [get]
-func GetAuth(c *gin.Context) {
-	param := service.AuthRequest{}
-	response := app.NewResponse(c)
-	valid, errs := app.BindAndValid(c, &param)
-	if !valid {
-		global.Logger.Errorf("app.BindAndValid errs: %v", errs)
-		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
+// @Param body body service.LoginRequest true "body"
+// @Success 200 {object} LoginResponse "success"
+// @Router /account/login [post]
+func Login(c *gin.Context) {
+	param := service.LoginRequest{}
+	errs := app.BindBodyWithValidation(c, &param)
+	if errs != nil {
+		app.ResponseError(c, http.StatusBadRequest,
+			"app.BindBodyWithValidation errs: "+strings.Join(errs.Errors(), ","))
 		return
 	}
 
 	svc := service.New(c.Request.Context())
-	err := svc.CheckAuth(&param)
+	err := svc.LoginAccount(&param)
 	if err != nil {
-		global.Logger.Errorf("svc.CheckAuth err: %v", err)
-		response.ToErrorResponse(errcode.UnauthorizedAuthNotExist)
+		app.ResponseError(c, http.StatusUnauthorized,
+			"svc.LoginAccount err: "+err.Error())
 		return
 	}
 
-	token, err := app.GenerateToken(param.Uname, param.Upassword)
+	token, err := app.GenerateJWTToken(param.ID, param.Password)
 	if err != nil {
-		global.Logger.Errorf("app.GenerateToken err: %v", err)
-		response.ToErrorResponse(errcode.UnauthorizedTokenGenerate)
+		app.ResponseError(c, http.StatusUnauthorized,
+			"app.GenerateJWTToken err: %v"+err.Error())
 		return
 	}
 
-	response.ToResponse(gin.H{
-		"token": token,
-		"uname": param.Uname,
-	})
+	c.JSON(http.StatusOK, LoginResponse{token})
 }
 
-// @Summary get add user
+// @Summary Register
 // @Produce json
-// @Param uname query int false "user name"
-// @Param upassword query int false "user password"
-// @Success 200 {object} model.Auth "success"
-// @Failure 400 {object} errcode.Error "request error"
-// @Failure 500 {object} errcode.Error "server error"
-// @Router /auth [post]
-func CreateAuth(c *gin.Context) {
-	param := service.CreateAuthRequest{}
-	param.Uname = c.Query("uname")
-	param.Upassword = c.Query("upassword")
-
-	response := app.NewResponse(c)
+// @Param body body service.RegisterRequest true "body"
+// @Success 200 {object} MessageResponse "success"
+// @Router /account/register [post]
+func Register(c *gin.Context) {
+	param := service.RegisterRequest{}
+	errors := app.BindBodyWithValidation(c, &param)
+	if errors != nil {
+		app.ResponseError(c, http.StatusBadRequest,
+			"Param errors: "+strings.Join(errors.Errors(), ", "))
+	}
 
 	svc := service.New(c.Request.Context())
-	if !svc.AuthExist(&service.AuthExistRequest{Uname: param.Uname}) {
-		response.ToErrorResponse(errcode.ErrorAuthExist)
+	if err := svc.RegisterAccount(&param); err != nil {
+		app.ResponseError(c, http.StatusInternalServerError,
+			"svc.Register: "+err.Error())
 		return
 	}
 
-	if err := svc.CreateAuth(&param); err != nil {
-		global.Logger.Errorf("svc.CreateAuth err: %v", err)
-		response.ToErrorResponse(errcode.ErrorAuthCreateFail)
+	c.JSON(http.StatusOK, MessageResponse{"success."})
+}
+
+// @Summary Delete account
+// @Produce json
+// @Param id path string true "id"
+// @Success 200 {object} MessageResponse "success"
+// @Router /account/delete/{id} [delete]
+func DeleteAccount(c *gin.Context) {
+	param := service.DeleteAccountRequest{}
+	param.ID = c.Param("id")
+	svc := service.New(c.Request.Context())
+	err := svc.DeleteAccount(&param)
+	if err != nil {
+		app.ResponseError(c, http.StatusInternalServerError,
+			"svc.DeleteAccount error:"+err.Error())
 		return
 	}
-
-	response.ToResponse(gin.H{})
+	c.JSON(http.StatusOK, MessageResponse{"success."})
 }
