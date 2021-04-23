@@ -27,7 +27,7 @@ func NewRouter() *gin.Engine {
 	//config.AllowCredentials = true
 	//r.Use(cors.New(config))
 
-	r.Use(static.Serve("/", static.LocalFile(global.AppSetting.StaticPagePath + "/", false)))
+	r.Use(static.Serve("/", static.LocalFile(global.AppSetting.StaticPagePath+"/", false)))
 
 	// swagger ui
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -48,8 +48,11 @@ func NewRouter() *gin.Engine {
 
 		comment := v1.NewComment()
 		apiV1.GET("/comments/:post_id", comment.List)
-		apiV1.POST("/comments", comment.Create)
-		apiV1.DELETE("/comments/:id", comment.Delete)
+		apiV1.POST("/comments/:post_id", comment.Create)
+		apiV1.DELETE("/comments/:post_id/:id", comment.Delete)
+		// todo: edit comment
+		//apiV1.PUT("/comments/:post_id/:id", comment.Edit)
+		//apiV1.GET("/comments/:post_id/:id", comment.Get)
 	}
 
 	return r

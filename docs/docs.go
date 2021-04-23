@@ -29,7 +29,7 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Delete account",
+                "summary": "Delete an account.",
                 "parameters": [
                     {
                         "type": "string",
@@ -81,7 +81,7 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Register",
+                "summary": "Register.",
                 "parameters": [
                     {
                         "description": "body",
@@ -103,38 +103,57 @@ var doc = `{
                 }
             }
         },
-        "/api/v1/comments/": {
+        "/api/v1/comments/{post_id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Get a comment list by the post id.",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "post id",
+                        "name": "post_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page number",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page size",
+                        "name": "page_size",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "$ref": "#/definitions/v1.CommentListResponse"
+                        }
+                    }
+                }
+            },
             "post": {
                 "produces": [
                     "application/json"
                 ],
-                "summary": "create comment",
+                "summary": "Comment a post.",
                 "parameters": [
                     {
-                        "description": "comment content",
-                        "name": "content",
+                        "description": "body",
+                        "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "creator id",
-                        "name": "createdby",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "description": "post id",
-                        "name": "postid",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
+                            "$ref": "#/definitions/service.CreateCommentRequest"
                         }
                     }
                 ],
@@ -142,31 +161,26 @@ var doc = `{
                     "200": {
                         "description": "success",
                         "schema": {
-                            "$ref": "#/definitions/model.Comment"
-                        }
-                    },
-                    "400": {
-                        "description": "request error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "server error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
+                            "$ref": "#/definitions/v1.MessageResponse"
                         }
                     }
                 }
             }
         },
-        "/api/v1/comments/{id}": {
+        "/api/v1/comments/{post_id}/{id}": {
             "delete": {
                 "produces": [
                     "application/json"
                 ],
-                "summary": "delete comment need adm cookie",
+                "summary": "Delete a comment.",
                 "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "post id",
+                        "name": "post_id",
+                        "in": "path",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "comment id",
@@ -179,68 +193,7 @@ var doc = `{
                     "200": {
                         "description": "success",
                         "schema": {
-                            "$ref": "#/definitions/model.Comment"
-                        }
-                    },
-                    "400": {
-                        "description": "request error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "server error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/comments/{post_id}": {
-            "get": {
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "get comment list with post id",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "post id",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "page size",
-                        "name": "page_size",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "schema": {
-                            "$ref": "#/definitions/model.CommentSwagger"
-                        }
-                    },
-                    "400": {
-                        "description": "request error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "server error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
+                            "$ref": "#/definitions/v1.MessageResponse"
                         }
                     }
                 }
@@ -331,7 +284,7 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "delete post need adm cookie",
+                "summary": "Delete a post.",
                 "parameters": [
                     {
                         "type": "integer",
@@ -353,66 +306,23 @@ var doc = `{
         }
     },
     "definitions": {
-        "app.Pager": {
-            "type": "object",
-            "properties": {
-                "page": {
-                    "type": "integer"
-                },
-                "page_size": {
-                    "type": "integer"
-                },
-                "total_size": {
-                    "type": "integer"
-                }
-            }
-        },
-        "errcode.Error": {
-            "type": "object"
-        },
         "model.Comment": {
             "type": "object",
             "properties": {
-                "agree": {
-                    "type": "integer"
-                },
                 "content": {
                     "type": "string"
-                },
-                "created_by": {
-                    "type": "string"
-                },
-                "created_on": {
-                    "type": "integer"
-                },
-                "deleted_on": {
-                    "type": "integer"
-                },
-                "disagree": {
-                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
                 },
                 "is_del": {
-                    "type": "integer"
+                    "type": "boolean"
                 },
                 "post_id": {
                     "type": "integer"
-                }
-            }
-        },
-        "model.CommentSwagger": {
-            "type": "object",
-            "properties": {
-                "list": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Comment"
-                    }
                 },
-                "pager": {
-                    "$ref": "#/definitions/app.Pager"
+                "user_id": {
+                    "type": "string"
                 }
             }
         },
@@ -430,6 +340,24 @@ var doc = `{
                 },
                 "user_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "service.CreateCommentRequest": {
+            "type": "object",
+            "required": [
+                "content",
+                "user_id"
+            ],
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "post_id": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "string"
                 }
             }
         },
@@ -475,6 +403,20 @@ var doc = `{
                 },
                 "password": {
                     "type": "string"
+                }
+            }
+        },
+        "v1.CommentListResponse": {
+            "type": "object",
+            "properties": {
+                "comments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Comment"
+                    }
+                },
+                "total_pages": {
+                    "type": "integer"
                 }
             }
         },

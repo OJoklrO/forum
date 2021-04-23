@@ -26,7 +26,7 @@ func (p Post) Count(db *gorm.DB) (int, error) {
 
 func (p Post) Get(db *gorm.DB) (*Post, error) {
 	var post Post
-	err := db.Where("id = ? AND is_del = ?", p.ID, 0).Find(&post).Error
+	err := db.Model(post).Where("id = ? AND is_del = ?", p.ID, 0).Find(&post).Error
 	return &post, err
 }
 
@@ -36,7 +36,7 @@ func (p Post) List(db *gorm.DB, pageOffset, pageSize int) ([]*Post, error) {
 	if pageOffset >= 0 && pageSize > 0 {
 		db = db.Offset(pageOffset).Limit(pageSize)
 	}
-	if err = db.Where("is_del = ?", 0).Find(&posts).Error; err != nil {
+	if err = db.Model(Post{}).Where("is_del = ?", 0).Find(&posts).Error; err != nil {
 		return nil, err
 	}
 	return posts, nil

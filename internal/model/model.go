@@ -8,15 +8,6 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
-// todo: delete
-type Model struct {
-	ID uint32 `gorm:"primary_key" json:"id"`
-	CreatedBy string `json:"created_by"`
-	CreatedOn uint32 `json:"created_on"`
-	DeletedOn uint32 `json:"deleted_on"`
-	IsDel uint8 `json:"is_del"`
-}
-
 func NewDBEngine(databaseSetting *setting.DatabaseSettings) (*gorm.DB, error) {
 	s := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=%s&parseTime=%t&loc=Local",
 		databaseSetting.UserName,

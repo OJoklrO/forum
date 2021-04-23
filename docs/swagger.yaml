@@ -1,44 +1,16 @@
 definitions:
-  app.Pager:
-    properties:
-      page:
-        type: integer
-      page_size:
-        type: integer
-      total_size:
-        type: integer
-    type: object
-  errcode.Error:
-    type: object
   model.Comment:
     properties:
-      agree:
-        type: integer
       content:
         type: string
-      created_by:
-        type: string
-      created_on:
-        type: integer
-      deleted_on:
-        type: integer
-      disagree:
-        type: integer
       id:
         type: integer
       is_del:
-        type: integer
+        type: boolean
       post_id:
         type: integer
-    type: object
-  model.CommentSwagger:
-    properties:
-      list:
-        items:
-          $ref: '#/definitions/model.Comment'
-        type: array
-      pager:
-        $ref: '#/definitions/app.Pager'
+      user_id:
+        type: string
     type: object
   model.Post:
     properties:
@@ -50,6 +22,18 @@ definitions:
         type: string
       user_id:
         type: integer
+    type: object
+  service.CreateCommentRequest:
+    properties:
+      content:
+        type: string
+      post_id:
+        type: integer
+      user_id:
+        type: string
+    required:
+    - content
+    - user_id
     type: object
   service.CreatePostRequest:
     properties:
@@ -80,6 +64,15 @@ definitions:
     required:
     - id
     - password
+    type: object
+  v1.CommentListResponse:
+    properties:
+      comments:
+        items:
+          $ref: '#/definitions/model.Comment'
+        type: array
+      total_pages:
+        type: integer
     type: object
   v1.LoginResponse:
     properties:
@@ -125,7 +118,7 @@ paths:
           description: success
           schema:
             $ref: '#/definitions/v1.MessageResponse'
-      summary: Delete account
+      summary: Delete an account.
   /account/login:
     post:
       parameters:
@@ -159,47 +152,57 @@ paths:
           description: success
           schema:
             $ref: '#/definitions/v1.MessageResponse'
-      summary: Register
-  /api/v1/comments/:
-    post:
+      summary: Register.
+  /api/v1/comments/{post_id}:
+    get:
       parameters:
-      - description: comment content
-        in: body
-        name: content
-        required: true
-        schema:
-          type: string
-      - description: creator id
-        in: body
-        name: createdby
-        required: true
-        schema:
-          type: integer
       - description: post id
-        in: body
-        name: postid
+        in: path
+        name: post_id
         required: true
-        schema:
-          type: integer
+        type: integer
+      - description: page number
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: page size
+        in: query
+        name: page_size
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
         "200":
           description: success
           schema:
-            $ref: '#/definitions/model.Comment'
-        "400":
-          description: request error
+            $ref: '#/definitions/v1.CommentListResponse'
+      summary: Get a comment list by the post id.
+    post:
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/service.CreateCommentRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
           schema:
-            $ref: '#/definitions/errcode.Error'
-        "500":
-          description: server error
-          schema:
-            $ref: '#/definitions/errcode.Error'
-      summary: create comment
-  /api/v1/comments/{id}:
+            $ref: '#/definitions/v1.MessageResponse'
+      summary: Comment a post.
+  /api/v1/comments/{post_id}/{id}:
     delete:
       parameters:
+      - description: post id
+        in: path
+        name: post_id
+        required: true
+        type: integer
       - description: comment id
         in: path
         name: id
@@ -211,48 +214,8 @@ paths:
         "200":
           description: success
           schema:
-            $ref: '#/definitions/model.Comment'
-        "400":
-          description: request error
-          schema:
-            $ref: '#/definitions/errcode.Error'
-        "500":
-          description: server error
-          schema:
-            $ref: '#/definitions/errcode.Error'
-      summary: delete comment need adm cookie
-  /api/v1/comments/{post_id}:
-    get:
-      parameters:
-      - description: post id
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: page number
-        in: query
-        name: page
-        type: integer
-      - description: page size
-        in: query
-        name: page_size
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: success
-          schema:
-            $ref: '#/definitions/model.CommentSwagger'
-        "400":
-          description: request error
-          schema:
-            $ref: '#/definitions/errcode.Error'
-        "500":
-          description: server error
-          schema:
-            $ref: '#/definitions/errcode.Error'
-      summary: get comment list with post id
+            $ref: '#/definitions/v1.MessageResponse'
+      summary: Delete a comment.
   /api/v1/posts:
     get:
       parameters:
@@ -305,7 +268,7 @@ paths:
           description: success
           schema:
             $ref: '#/definitions/model.Post'
-      summary: delete post need adm cookie
+      summary: Delete a post.
     get:
       parameters:
       - description: Post ID

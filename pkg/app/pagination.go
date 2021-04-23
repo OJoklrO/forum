@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// todo: delete pager
 func GetPage(c *gin.Context) int {
 	page := convert.StrTo(c.Query("page")).MustInt()
 	return page

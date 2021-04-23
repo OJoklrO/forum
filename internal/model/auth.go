@@ -18,7 +18,7 @@ func (a Account) TableName() string {
 
 func (a Account) Check(db *gorm.DB) error {
 	var account Account
-	db = db.Where("id = ? AND password = ? AND is_del = ?",
+	db = db.Model(a).Where("id = ? AND password = ? AND is_del = ?",
 		a.ID, a.Password, 0)
 	return db.First(&account).Error
 }
