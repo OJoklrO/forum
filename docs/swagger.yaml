@@ -59,37 +59,38 @@ definitions:
     type: object
   model.Post:
     properties:
-      agree:
-        type: integer
-      content:
-        type: string
-      created_by:
-        type: string
-      created_on:
-        type: integer
-      deleted_on:
-        type: integer
-      desc:
-        type: string
-      desc_img:
-        type: string
-      disagree:
-        type: integer
       id:
         type: integer
       is_del:
         type: integer
       title:
         type: string
+      user_id:
+        type: integer
     type: object
-  model.PostSwagger:
+  service.CreatePostRequest:
     properties:
-      list:
+      title:
+        type: string
+      user_id:
+        type: integer
+    required:
+    - title
+    - user_id
+    type: object
+  v1.PostCreateResponse:
+    properties:
+      post_id:
+        type: integer
+    type: object
+  v1.PostListResponse:
+    properties:
+      posts:
         items:
           $ref: '#/definitions/model.Post'
         type: array
-      pager:
-        $ref: '#/definitions/app.Pager'
+      total_pages:
+        type: integer
     type: object
   v1.Token:
     properties:
@@ -98,9 +99,8 @@ definitions:
     type: object
 info:
   contact: {}
-  description: student forum api
   title: forum
-  version: "1.0"
+  version: "0.01"
 paths:
   /api/v1/comments/:
     post:
@@ -198,75 +198,39 @@ paths:
   /api/v1/posts:
     get:
       parameters:
-      - description: page number
+      - description: Page number
         in: query
         name: page
+        required: true
         type: integer
-      - description: page size
+      - description: Page size
         in: query
         name: page_size
+        required: true
         type: integer
-      - description: filter
-        in: query
-        name: filter
-        type: string
       produces:
       - application/json
       responses:
         "200":
           description: success
           schema:
-            $ref: '#/definitions/model.PostSwagger'
-        "400":
-          description: request error
-          schema:
-            $ref: '#/definitions/errcode.Error'
-        "500":
-          description: server error
-          schema:
-            $ref: '#/definitions/errcode.Error'
-      summary: get post list
+            $ref: '#/definitions/v1.PostListResponse'
+      summary: Get a post list with pagination settings.
     post:
       parameters:
-      - description: post title
+      - description: body
         in: body
-        name: title
+        name: body
         required: true
         schema:
-          type: string
-      - description: desc image url
-        in: body
-        name: desc_img
-        required: true
-        schema:
-          type: string
-      - description: creator
-        in: body
-        name: createdby
-        required: true
-        schema:
-          type: string
-      - description: post content
-        in: body
-        name: content
-        required: true
-        schema:
-          type: string
+          $ref: '#/definitions/service.CreatePostRequest'
       produces:
       - application/json
       responses:
         "200":
           description: success
           schema:
-            $ref: '#/definitions/model.Post'
-        "400":
-          description: request error
-          schema:
-            $ref: '#/definitions/errcode.Error'
-        "500":
-          description: server error
-          schema:
-            $ref: '#/definitions/errcode.Error'
+            $ref: '#/definitions/v1.PostCreateResponse'
       summary: create post
   /api/v1/posts/{id}:
     delete:
@@ -283,18 +247,10 @@ paths:
           description: success
           schema:
             $ref: '#/definitions/model.Post'
-        "400":
-          description: request error
-          schema:
-            $ref: '#/definitions/errcode.Error'
-        "500":
-          description: server error
-          schema:
-            $ref: '#/definitions/errcode.Error'
       summary: delete post need adm cookie
     get:
       parameters:
-      - description: post id
+      - description: Post ID
         in: path
         name: id
         required: true
@@ -303,18 +259,10 @@ paths:
       - application/json
       responses:
         "200":
-          description: success
+          description: Post data
           schema:
             $ref: '#/definitions/model.Post'
-        "400":
-          description: request error
-          schema:
-            $ref: '#/definitions/errcode.Error'
-        "500":
-          description: server error
-          schema:
-            $ref: '#/definitions/errcode.Error'
-      summary: get post by id
+      summary: Get a post by id
   /auth:
     get:
       parameters:

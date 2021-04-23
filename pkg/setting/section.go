@@ -10,9 +10,7 @@ type ServerSettings struct {
 }
 
 type AppSettings struct {
-	DefaultPageSize     int
 	DefaultDescLen      int
-	MaxPageSize         int
 	LogSavePath         string
 	LogFileName         string
 	LogFileExt          string

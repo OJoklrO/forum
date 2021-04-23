@@ -2,6 +2,7 @@ package dao
 
 import "github.com/jinzhu/gorm"
 
+// todo: delete all dao
 type Dao struct {
 	engine *gorm.DB
 }

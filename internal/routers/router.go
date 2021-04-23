@@ -18,6 +18,7 @@ func NewRouter() *gin.Engine {
 
 	r.Use(middleware.Translations())
 
+	// todo: cors
 	//config := cors.DefaultConfig()
 	//config.AllowAllOrigins = true
 	//config.AllowHeaders = []string{"token", "Authorization", "Content-Type", "Upgrade", "Origin",
@@ -36,21 +37,21 @@ func NewRouter() *gin.Engine {
 	// swagger ui
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	post := v1.NewPost()
-	comment := v1.NewComment()
 
 	r.GET("/auth", v1.GetAuth)
 	r.POST("/auth/operators/create", v1.CreateAuth)
 
 	apiv1 := r.Group("api/v1")
 	{
-		apiv1.Use(middleware.JWT())
-
+		// todo: jwt
+		//apiv1.Use(middleware.JWT())
+		post := v1.NewPost()
 		apiv1.GET("/posts", post.List)
 		apiv1.GET("/posts/:id", post.Get)
-		apiv1.POST("/posts", post.CreateTemp)
+		apiv1.POST("/posts", post.Create)
 		apiv1.DELETE("/posts/:id", post.Delete)
 
+		comment := v1.NewComment()
 		apiv1.GET("/comments/:post_id", comment.List)
 		apiv1.POST("/comments", comment.Create)
 		apiv1.DELETE("/comments/:id", comment.Delete)

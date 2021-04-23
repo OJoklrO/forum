@@ -5,10 +5,41 @@ import (
 	"net/http"
 )
 
+// todo: remove err code
+var (
+	ErrorAuthExist      = NewError(30000001, "user has exist")
+	ErrorAuthCreateFail = NewError(30000002, "create user error")
+)
+
+var (
+	Success                   = NewError(0, "success")
+	ServerError               = NewError(10000000, "server error")
+	InvalidParams             = NewError(10000001, "invalid params")
+	NotFound                  = NewError(10000002, "not found")
+	UnauthorizedAuthNotExist  = NewError(10000003, "auth not exist")
+	UnauthorizedTokenError    = NewError(10000004, "token error")
+	UnauthorizedTokenTimeout  = NewError(10000005, "token time out")
+	UnauthorizedTokenGenerate = NewError(10000006, "token generate error")
+	TooManyRequests           = NewError(10000007, "too many request")
+)
+
+var (
+	ErrorCountPostsFail  = NewError(20010001, "count posts error")
+	ErrorGetPostFail     = NewError(20010002, "get post error")
+	ErrorGetPostListFail = NewError(20010003, "get post list error")
+	ErrorCreatePostFail  = NewError(20010004, "create post error")
+	ErrorDeletePostFail  = NewError(20010005, "delete post error")
+
+	ErrorListCommentsFail  = NewError(20020001, "list comments error")
+	ErrorCountCommentsFail = NewError(20020002, "count comments error")
+	ErrorCreateCommentFail = NewError(20020003, "create comment error")
+	ErrorDeleteCommentFail = NewError(20020004, "delete comment error")
+)
+
 type Error struct {
-	code    int         `json:"code"`
-	msg     string      `json:"msg"`
-	details []string    `json:"details"`
+	code    int      `json:"code"`
+	msg     string   `json:"msg"`
+	details []string `json:"details"`
 }
 
 var codes = map[int]string{}

@@ -172,44 +172,28 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "get post list",
+                "summary": "Get a post list with pagination settings.",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "page number",
+                        "description": "Page number",
                         "name": "page",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     },
                     {
                         "type": "integer",
-                        "description": "page size",
+                        "description": "Page size",
                         "name": "page_size",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "filter",
-                        "name": "filter",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "success",
                         "schema": {
-                            "$ref": "#/definitions/model.PostSwagger"
-                        }
-                    },
-                    "400": {
-                        "description": "request error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "server error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
+                            "$ref": "#/definitions/v1.PostListResponse"
                         }
                     }
                 }
@@ -221,39 +205,12 @@ var doc = `{
                 "summary": "create post",
                 "parameters": [
                     {
-                        "description": "post title",
-                        "name": "title",
+                        "description": "body",
+                        "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "desc image url",
-                        "name": "desc_img",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "creator",
-                        "name": "createdby",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "description": "post content",
-                        "name": "content",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/service.CreatePostRequest"
                         }
                     }
                 ],
@@ -261,19 +218,7 @@ var doc = `{
                     "200": {
                         "description": "success",
                         "schema": {
-                            "$ref": "#/definitions/model.Post"
-                        }
-                    },
-                    "400": {
-                        "description": "request error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "server error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
+                            "$ref": "#/definitions/v1.PostCreateResponse"
                         }
                     }
                 }
@@ -284,11 +229,11 @@ var doc = `{
                 "produces": [
                     "application/json"
                 ],
-                "summary": "get post by id",
+                "summary": "Get a post by id",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "post id",
+                        "description": "Post ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -296,21 +241,9 @@ var doc = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "success",
+                        "description": "Post data",
                         "schema": {
                             "$ref": "#/definitions/model.Post"
-                        }
-                    },
-                    "400": {
-                        "description": "request error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "server error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
                         }
                     }
                 }
@@ -334,18 +267,6 @@ var doc = `{
                         "description": "success",
                         "schema": {
                             "$ref": "#/definitions/model.Post"
-                        }
-                    },
-                    "400": {
-                        "description": "request error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "server error",
-                        "schema": {
-                            "$ref": "#/definitions/errcode.Error"
                         }
                     }
                 }
@@ -527,30 +448,6 @@ var doc = `{
         "model.Post": {
             "type": "object",
             "properties": {
-                "agree": {
-                    "type": "integer"
-                },
-                "content": {
-                    "type": "string"
-                },
-                "created_by": {
-                    "type": "string"
-                },
-                "created_on": {
-                    "type": "integer"
-                },
-                "deleted_on": {
-                    "type": "integer"
-                },
-                "desc": {
-                    "type": "string"
-                },
-                "desc_img": {
-                    "type": "string"
-                },
-                "disagree": {
-                    "type": "integer"
-                },
                 "id": {
                     "type": "integer"
                 },
@@ -559,20 +456,46 @@ var doc = `{
                 },
                 "title": {
                     "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },
-        "model.PostSwagger": {
+        "service.CreatePostRequest": {
+            "type": "object",
+            "required": [
+                "title",
+                "user_id"
+            ],
+            "properties": {
+                "title": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.PostCreateResponse": {
             "type": "object",
             "properties": {
-                "list": {
+                "post_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.PostListResponse": {
+            "type": "object",
+            "properties": {
+                "posts": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/model.Post"
                     }
                 },
-                "pager": {
-                    "$ref": "#/definitions/app.Pager"
+                "total_pages": {
+                    "type": "integer"
                 }
             }
         },
@@ -598,12 +521,12 @@ type swaggerInfo struct {
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = swaggerInfo{
-	Version:     "1.0",
+	Version:     "0.01",
 	Host:        "",
 	BasePath:    "",
 	Schemes:     []string{},
 	Title:       "forum",
-	Description: "student forum api",
+	Description: "",
 }
 
 type s struct{}

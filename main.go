@@ -28,8 +28,7 @@ func init() {
 }
 
 // @title forum
-// @version 1.0
-// @description student forum api
+// @version 0.01
 func main() {
 	router := routers.NewRouter()
 	s := http.Server{

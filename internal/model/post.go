@@ -1,30 +1,21 @@
 package model
 
 import (
-	"github.com/OJoklrO/forum/pkg/app"
 	"github.com/jinzhu/gorm"
 )
 
 type Post struct {
-	*Model
-	Content string `json:"content"`
-	Title string `json:"title"`
-	Desc string `json:"desc"`
-	DescImg string `json:"desc_img"`
-	Agree int `json:"agree"`
-	Disagree int `json:"disagree"`
+	ID     uint32 `gorm:"primary_key" json:"id"`
+	Title  string `json:"title"`
+	UserID uint32 `json:"user_id"`
+	IsDel  uint8  `json:"is_del"`
 }
 
 func (p Post) TableName() string {
 	return "post"
 }
 
-type PostSwagger struct {
-	List []*Post
-	Pager *app.Pager
-}
-
-func (p Post) Count(db *gorm.DB, filter string) (int, error) {
+func (p Post) Count(db *gorm.DB) (int, error) {
 	var count int
 	err := db.Model(&p).Where("is_del = ?", 0).Count(&count).Error
 	if err != nil {
@@ -39,7 +30,7 @@ func (p Post) Get(db *gorm.DB) (*Post, error) {
 	return &post, err
 }
 
-func (p Post) List(db *gorm.DB, pageOffset, pageSize int, filter string) ([]*Post, error) {
+func (p Post) List(db *gorm.DB, pageOffset, pageSize int) ([]*Post, error) {
 	var posts []*Post
 	var err error
 	if pageOffset >= 0 && pageSize > 0 {
@@ -56,9 +47,5 @@ func (p Post) Create(db *gorm.DB) *Post {
 }
 
 func (p Post) Update(db *gorm.DB, v interface{}) error {
-	return db.Model(&Post{}).Where("id = ? AND is_del = ?", p.ID, 0).Updates(v).Error
-}
-
-func (p Post) Delete(db *gorm.DB) error {
-	return db.Where("id = ? AND is_del = ?", p.ID, 0).Delete(&p).Error
+	return db.Model(&Post{}).Where("id = ?", p.ID).Updates(v).Error
 }
