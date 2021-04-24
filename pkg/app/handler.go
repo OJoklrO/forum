@@ -1,11 +1,20 @@
 package app
 
 import (
+	"github.com/OJoklrO/forum/global"
 	"github.com/gin-gonic/gin"
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	"strings"
 )
+
+func ResponseError(c *gin.Context, code int, msg string) {
+	global.Logger.Error(msg)
+	c.JSON(code, gin.H{
+		"msg": msg,
+	})
+	return
+}
 
 type ValidError struct {
 	Key     string
@@ -30,41 +39,15 @@ func (v ValidErrors) Errors() []string {
 	return errs
 }
 
-// todo: remove bindAnd valid
-func BindAndValid(c *gin.Context, v interface{}) (bool, ValidErrors) {
-	var errs ValidErrors
-	err := c.ShouldBind(v)
-	if err != nil {
-		v := c.Value("trans")
-		trans, _ := v.(ut.Translator)
-		verrs, ok := err.(validator.ValidationErrors)
-		if !ok {
-			return false, errs
-		}
-
-		for key, value := range verrs.Translate(trans) {
-			errs = append(errs, &ValidError{
-				Key:     key,
-				Message: value,
-			})
-		}
-		return false, errs
-	}
-	return true, nil
-}
-
+// BindBodyWithValidation binds values from POST request body.
 func BindBodyWithValidation(c *gin.Context, v interface{}) ValidErrors {
 	var errs ValidErrors
 	err := c.ShouldBind(v)
 	if err != nil {
 		v := c.Value("trans")
 		trans, _ := v.(ut.Translator)
-		verrs, ok := err.(validator.ValidationErrors)
-		if !ok {
-			return errs
-		}
-
-		for key, value := range verrs.Translate(trans) {
+		vErrs, _ := err.(validator.ValidationErrors)
+		for key, value := range vErrs.Translate(trans) {
 			errs = append(errs, &ValidError{
 				Key:     key,
 				Message: value,

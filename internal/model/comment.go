@@ -1,7 +1,6 @@
 package model
 
 import (
-	"github.com/OJoklrO/forum/pkg/app"
 	"github.com/jinzhu/gorm"
 )
 
@@ -11,11 +10,6 @@ type Comment struct {
 	UserID  string `json:"user_id"`
 	Content string `json:"content"`
 	IsDel   bool   `json:"is_del"`
-}
-
-type CommentSwagger struct {
-	List  []*Comment
-	Pager *app.Pager
 }
 
 func (c *Comment) TableName() string {

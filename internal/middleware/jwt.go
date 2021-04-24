@@ -2,44 +2,40 @@ package middleware
 
 import (
 	"github.com/OJoklrO/forum/pkg/app"
-	"github.com/OJoklrO/forum/pkg/errcode"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func JWT() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			token string
-			ecode = errcode.Success
 		)
 		if s, exist := c.GetQuery("token"); exist {
 			token = s
 		} else {
 			token = c.GetHeader("token")
 		}
-		if token == "" {
-			ecode = errcode.InvalidParams
-		} else {
-			_, err := app.ParseToken(token)
-			if err != nil {
-				switch err.(*jwt.ValidationError).Errors {
-				case jwt.ValidationErrorExpired:
-					ecode = errcode.UnauthorizedTokenTimeout
-				default:
-					ecode = errcode.UnauthorizedTokenError
-				}
-			}
-		}
-		c.Set("token", token)
 
-		if ecode != errcode.Success {
-			response := app.NewResponse(c)
-			response.ToErrorResponse(ecode)
+		if token == "" {
+			app.ResponseError(c, http.StatusUnauthorized, "the token is empty")
 			c.Abort()
 			return
 		}
 
+		_, err := app.ParseToken(token)
+		if err != nil {
+			if err.(*jwt.ValidationError).Errors == jwt.ValidationErrorExpired {
+				app.ResponseError(c, http.StatusUnauthorized, "token expired")
+			} else {
+				app.ResponseError(c, http.StatusUnauthorized, "token validation error")
+			}
+			c.Abort()
+			return
+		}
+
+		c.Set("token", token)
 		c.Next()
 	}
 }
