@@ -1,10 +1,10 @@
 package routers
 
 import (
-	_ "github.com/OJoklrO/forum/docs"
-	"github.com/OJoklrO/forum/global"
-	"github.com/OJoklrO/forum/internal/middleware"
-	v1 "github.com/OJoklrO/forum/internal/routers/api/v1"
+	_ "forum/docs"
+	"forum/global"
+	"forum/internal/middleware"
+	v1 "forum/internal/routers/api/v1"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -39,7 +39,7 @@ func NewRouter() *gin.Engine {
 		r.DELETE("/account/delete/:id", v1.DeleteAccount)
 
 		// todo: jwt
-		//apiV1.Use(middleware.JWT())
+		apiV1.Use(middleware.JWT())
 		post := v1.NewPost()
 		apiV1.GET("/posts", post.List)
 		apiV1.GET("/posts/:id", post.Get)

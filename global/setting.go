@@ -1,8 +1,8 @@
 package global
 
 import (
-	"github.com/OJoklrO/forum/pkg/logger"
-	"github.com/OJoklrO/forum/pkg/setting"
+	"forum/pkg/logger"
+	"forum/pkg/setting"
 )
 
 var (

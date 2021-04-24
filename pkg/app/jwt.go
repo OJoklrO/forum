@@ -3,7 +3,7 @@ package app
 import (
 	"time"
 
-	"github.com/OJoklrO/forum/global"
+	"forum/global"
 	"github.com/dgrijalva/jwt-go"
 )
 

@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/OJoklrO/forum/global"
-	"github.com/OJoklrO/forum/internal/model"
-	"github.com/OJoklrO/forum/internal/routers"
-	"github.com/OJoklrO/forum/pkg/logger"
-	"github.com/OJoklrO/forum/pkg/setting"
+	"forum/global"
+	"forum/internal/model"
+	"forum/internal/routers"
+	"forum/pkg/logger"
+	"forum/pkg/setting"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"log"
 	"net/http"

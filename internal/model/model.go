@@ -2,8 +2,8 @@ package model
 
 import (
 	"fmt"
-	"github.com/OJoklrO/forum/global"
-	"github.com/OJoklrO/forum/pkg/setting"
+	"forum/global"
+	"forum/pkg/setting"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )

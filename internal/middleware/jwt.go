@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/OJoklrO/forum/pkg/app"
+	"forum/pkg/app"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"

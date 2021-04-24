@@ -1,9 +1,9 @@
 package v1
 
 import (
-	"github.com/OJoklrO/forum/internal/model"
-	"github.com/OJoklrO/forum/internal/service"
-	"github.com/OJoklrO/forum/pkg/app"
+	"forum/internal/model"
+	"forum/internal/service"
+	"forum/pkg/app"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"

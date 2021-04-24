@@ -2,7 +2,7 @@ package service
 
 import (
 	"errors"
-	"github.com/OJoklrO/forum/internal/model"
+	"forum/internal/model"
 )
 
 type LoginRequest struct {

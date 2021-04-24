@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"github.com/OJoklrO/forum/global"
+	"forum/global"
 	"github.com/jinzhu/gorm"
 )
 

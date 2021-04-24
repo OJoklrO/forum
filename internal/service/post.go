@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/OJoklrO/forum/internal/model"
+	"forum/internal/model"
 )
 
 func (svc *Service) CountPosts() (int, error) {
