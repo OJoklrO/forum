@@ -33,19 +33,16 @@ func GenerateJWTToken(id, name string) (string, error) {
 	return token, err
 }
 
+// todo: learn jwt in depth
+
 func ParseToken(token string) (*Claims, error) {
 	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return GetJWTSecret(), nil
 	})
 	if err != nil {
 		return nil, err
+	} else {
+		claims, _ := tokenClaims.Claims.(*Claims)
+		return claims, nil
 	}
-	if tokenClaims != nil {
-		claims, ok := tokenClaims.Claims.(*Claims)
-		if ok && tokenClaims.Valid {
-			return claims, nil
-		}
-	}
-
-	return nil, err
 }

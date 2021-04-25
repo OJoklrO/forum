@@ -7,7 +7,7 @@ import (
 type Post struct {
 	ID     uint32 `gorm:"primary_key" json:"id"`
 	Title  string `json:"title"`
-	UserID uint32 `json:"user_id"`
+	UserID string `json:"user_id"`
 	IsDel  uint8  `json:"is_del"`
 }
 
@@ -42,8 +42,12 @@ func (p Post) List(db *gorm.DB, pageOffset, pageSize int) ([]*Post, error) {
 	return posts, nil
 }
 
-func (p Post) Create(db *gorm.DB) *Post {
-	return db.Create(&p).Value.(*Post)
+func (p Post) Create(db *gorm.DB) (*Post, error) {
+	db = db.Create(&p)
+	if db.Error != nil {
+		return nil, db.Error
+	}
+	return db.Value.(*Post), nil
 }
 
 func (p Post) Update(db *gorm.DB, v interface{}) error {

@@ -24,8 +24,8 @@ type CommentListResponse struct {
 // @Summary Get a comment list by the post id.
 // @Produce json
 // @Param post_id path int true "post id"
-// @Param page query int true "page number"
-// @Param page_size query int true "page size"
+// @Param page query int true "page number" default(1)
+// @Param page_size query int true "page size" default(20)
 // @Success 200 {object} CommentListResponse "success"
 // @Router /api/v1/comments/{post_id} [get]
 func (comment *Comment) List(c *gin.Context) {
@@ -37,7 +37,7 @@ func (comment *Comment) List(c *gin.Context) {
 	}
 	param.PostID = uint32(postID)
 
-	svc := service.New(c.Request.Context())
+	svc := service.New(c)
 	totalPages, err := svc.CountComments(&service.CountCommentsRequest{PostID: param.PostID})
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
@@ -68,6 +68,7 @@ func (comment *Comment) List(c *gin.Context) {
 // @Summary Comment a post.
 // @Produce json
 // @Param body body service.CreateCommentRequest true "body"
+// @Param token header string true "jwt token"
 // @Success 200 {object} MessageResponse "success"
 // @Router /api/v1/comments/{post_id} [post]
 func (comment *Comment) Create(c *gin.Context) {
@@ -79,7 +80,7 @@ func (comment *Comment) Create(c *gin.Context) {
 		return
 	}
 
-	svc := service.New(c.Request.Context())
+	svc := service.New(c)
 	err := svc.CreateComment(&param)
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
@@ -97,6 +98,7 @@ func (comment *Comment) Create(c *gin.Context) {
 // @Success 200 {object} MessageResponse "success"
 // @Router /api/v1/comments/{post_id}/{id} [delete]
 func (comment *Comment) Delete(c *gin.Context) {
+	// todo: delete permission(admin or owner)
 	param := service.DeleteCommentRequest{}
 	id, errId := strconv.Atoi(c.Param("id"))
 	postId, errPost := strconv.Atoi(c.Param("post_id"))
@@ -107,7 +109,7 @@ func (comment *Comment) Delete(c *gin.Context) {
 	param.ID = uint32(id)
 	param.PostID = uint32(postId)
 
-	svc := service.New(c.Request.Context())
+	svc := service.New(c)
 	err := svc.DeleteComment(&param)
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,

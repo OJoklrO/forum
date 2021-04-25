@@ -39,17 +39,16 @@ func NewRouter() *gin.Engine {
 		r.DELETE("/account/delete/:id", v1.DeleteAccount)
 
 		// todo: jwt
-		apiV1.Use(middleware.JWT())
 		post := v1.NewPost()
 		apiV1.GET("/posts", post.List)
 		apiV1.GET("/posts/:id", post.Get)
-		apiV1.POST("/posts", post.Create)
-		apiV1.DELETE("/posts/:id", post.Delete)
+		apiV1.POST("/posts", middleware.JWT(), post.Create)
+		apiV1.DELETE("/posts/:id", middleware.JWT(), post.Delete)
 
 		comment := v1.NewComment()
 		apiV1.GET("/comments/:post_id", comment.List)
-		apiV1.POST("/comments/:post_id", comment.Create)
-		apiV1.DELETE("/comments/:post_id/:id", comment.Delete)
+		apiV1.POST("/comments/:post_id", middleware.JWT(), comment.Create)
+		apiV1.DELETE("/comments/:post_id/:id", middleware.JWT(), comment.Delete)
 		// todo: edit comment
 		//apiV1.PUT("/comments/:post_id/:id", comment.Edit)
 		//apiV1.GET("/comments/:post_id/:id", comment.Get)

@@ -29,14 +29,13 @@ func (svc *Service) ListComment(param *ListCommentRequest, page, pageSize int) (
 }
 
 type CreateCommentRequest struct {
-	UserID  string `form:"user_id" binding:"required" json:"user_id"`
 	PostID  uint32 `form:"post_id" binding:"gte=0" json:"post_id"`
 	Content string `form:"content" binding:"required" json:"content"`
 }
 
 func (svc *Service) CreateComment(param *CreateCommentRequest) error {
 	c := model.Comment{
-		UserID:  param.UserID,
+		UserID:  svc.ctx.Value("user_id").(string),
 		PostID:  param.PostID,
 		Content: param.Content,
 	}

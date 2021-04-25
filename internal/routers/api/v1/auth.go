@@ -26,7 +26,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	svc := service.New(c.Request.Context())
+	svc := service.New(c)
 	err := svc.LoginAccount(&param)
 	if err != nil {
 		app.ResponseError(c, http.StatusUnauthorized,
@@ -57,7 +57,7 @@ func Register(c *gin.Context) {
 			"Param errors: "+strings.Join(errors.Errors(), ", "))
 	}
 
-	svc := service.New(c.Request.Context())
+	svc := service.New(c)
 	if err := svc.RegisterAccount(&param); err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.Register: "+err.Error())
@@ -75,7 +75,7 @@ func Register(c *gin.Context) {
 func DeleteAccount(c *gin.Context) {
 	param := service.DeleteAccountRequest{}
 	param.ID = c.Param("id")
-	svc := service.New(c.Request.Context())
+	svc := service.New(c)
 	err := svc.DeleteAccount(&param)
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,

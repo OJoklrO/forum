@@ -31,7 +31,7 @@ func (p Post) Get(c *gin.Context) {
 
 	param := service.GetPostRequest{}
 	param.ID = uint32(id)
-	svc := service.New(c.Request.Context())
+	svc := service.New(c)
 	post, err := svc.GetPost(&param)
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
@@ -48,12 +48,12 @@ type PostListResponse struct {
 
 // @Summary Get a post list with pagination settings.
 // @Produce json
-// @Param page query int true "Page number"
-// @Param page_size query int true "Page size"
+// @Param page query int true "Page number" default(1)
+// @Param page_size query int true "Page size" default(20)
 // @Success 200 {object} PostListResponse "success"
 // @Router /api/v1/posts [get]
 func (p Post) List(c *gin.Context) {
-	svc := service.New(c.Request.Context())
+	svc := service.New(c)
 	count, err := svc.CountPosts()
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
@@ -86,9 +86,10 @@ type PostCreateResponse struct {
 	PostID uint32 `json:"post_id"`
 }
 
-// @Summary create post
+// @Summary Create a post.
 // @Produce json
 // @Param body body service.CreatePostRequest true "body"
+// @Param token header string true "jwt token"
 // @Success 200 {object} PostCreateResponse "success"
 // @Router /api/v1/posts [post]
 func (p Post) Create(c *gin.Context) {
@@ -101,22 +102,11 @@ func (p Post) Create(c *gin.Context) {
 		return
 	}
 
-	// todo: jwt
-	//calims, err := app.ParseToken(c.Keys["token"].(string))
-	//if err != nil {
-	//	global.Logger.Errorf("app.ParseToken errs: %v", err)
-	//	response.ToErrorResponse(errcode.NewError(1213123, "developer is sb"))
-	//	return
-	//}
-	//param.UserID = convert.StrTo(calims.ID).MustUInt32()
-
-	// todo: apply content to comments(create post)
-
-	svc := service.New(c.Request.Context())
-	post := svc.CreatePost(&param)
-	if post == nil {
+	svc := service.New(c)
+	post, err := svc.CreatePost(&param)
+	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
-			"svc.CreatePost err")
+			"svc.CreatePost error: "+err.Error())
 		return
 	}
 
@@ -131,6 +121,7 @@ func (p Post) Create(c *gin.Context) {
 // @Success 200 {object} model.Post "success"
 // @Router /api/v1/posts/{id} [delete]
 func (p Post) Delete(c *gin.Context) {
+	// todo: check permission(admin or owner)
 	param := service.DeletePostRequest{}
 	id, err := strconv.Atoi(c.Param("id"))
 	param.ID = uint32(id)
@@ -140,7 +131,7 @@ func (p Post) Delete(c *gin.Context) {
 		return
 	}
 
-	svc := service.New(c.Request.Context())
+	svc := service.New(c)
 	err = svc.DeletePost(&param)
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,

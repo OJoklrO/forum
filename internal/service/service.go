@@ -1,17 +1,17 @@
 package service
 
 import (
-	"context"
 	"forum/global"
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 )
 
 type Service struct {
-	ctx context.Context
+	ctx *gin.Context
 	db  *gorm.DB
 }
 
-func New(ctx context.Context) Service {
+func New(ctx *gin.Context) Service {
 	svc := Service{ctx, global.DBEngine}
 	return svc
 }

@@ -24,7 +24,7 @@ func JWT() gin.HandlerFunc {
 			return
 		}
 
-		_, err := app.ParseToken(token)
+		claims, err := app.ParseToken(token)
 		if err != nil {
 			if err.(*jwt.ValidationError).Errors == jwt.ValidationErrorExpired {
 				app.ResponseError(c, http.StatusUnauthorized, "token expired")
@@ -36,6 +36,8 @@ func JWT() gin.HandlerFunc {
 		}
 
 		c.Set("token", token)
+		c.Set("user_name", claims.Name)
+		c.Set("user_id", claims.Subject)
 		c.Next()
 	}
 }

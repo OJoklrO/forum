@@ -30,16 +30,25 @@ func (svc *Service) GetPostList(page, pageSize int) ([]*model.Post, error) {
 }
 
 type CreatePostRequest struct {
-	Title  string `json:"title" form:"title" binding:"required,min=1,max=100"`
-	UserID uint32 `json:"user_id" form:"user_id" binding:"required,gte=1"`
+	Title   string `json:"title" form:"title" binding:"required,min=1,max=100"`
+	Content string `json:"content" form:"content" binding:"required,min=1,max=100"`
 }
 
-func (svc *Service) CreatePost(param *CreatePostRequest) *model.Post {
+func (svc *Service) CreatePost(param *CreatePostRequest) (post *model.Post, err error) {
+	userId := svc.ctx.Value("user_id").(string)
 	p := model.Post{
-		UserID: param.UserID,
+		UserID: userId,
 		Title:  param.Title,
 	}
-	return p.Create(svc.db)
+	post, err = p.Create(svc.db)
+	if err != nil {
+		return
+	}
+	err = svc.CreateComment(&CreateCommentRequest{
+		PostID:  post.ID,
+		Content: param.Content,
+	})
+	return
 }
 
 type DeletePostRequest struct {
