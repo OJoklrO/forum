@@ -36,7 +36,7 @@ func NewRouter() *gin.Engine {
 	{
 		r.POST("/account/login", v1.Login)
 		r.POST("/account/register", v1.Register)
-		r.DELETE("/account/delete/:id", v1.DeleteAccount)
+		r.DELETE("/account/delete/:id", middleware.JWT(), v1.DeleteAccount)
 
 		// todo: jwt
 		post := v1.NewPost()
@@ -47,11 +47,10 @@ func NewRouter() *gin.Engine {
 
 		comment := v1.NewComment()
 		apiV1.GET("/comments/:post_id", comment.List)
-		apiV1.POST("/comments/:post_id", middleware.JWT(), comment.Create)
+		apiV1.POST("/comments", middleware.JWT(), comment.Create)
+		apiV1.PUT("/comments", middleware.JWT(), comment.Edit)
 		apiV1.DELETE("/comments/:post_id/:id", middleware.JWT(), comment.Delete)
-		// todo: edit comment
-		//apiV1.PUT("/comments/:post_id/:id", comment.Edit)
-		//apiV1.GET("/comments/:post_id/:id", comment.Get)
+		apiV1.GET("/comments/:post_id/:id", comment.Get)
 	}
 
 	return r

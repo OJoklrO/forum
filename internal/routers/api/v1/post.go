@@ -118,6 +118,7 @@ func (p Post) Create(c *gin.Context) {
 // @Summary Delete a post.
 // @Produce json
 // @Param id path int true "post id"
+// @Param token header string true "jwt token"
 // @Success 200 {object} model.Post "success"
 // @Router /api/v1/posts/{id} [delete]
 func (p Post) Delete(c *gin.Context) {

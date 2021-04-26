@@ -56,7 +56,16 @@ type DeletePostRequest struct {
 }
 
 func (svc *Service) DeletePost(param *DeletePostRequest) error {
-	p := model.Post{
+	p, err := svc.GetPost(&GetPostRequest{ID: param.ID})
+	if err != nil {
+		return err
+	}
+	err = svc.CheckCommonPermission(p.UserID)
+	if err != nil {
+		return err
+	}
+
+	p = &model.Post{
 		ID:    param.ID,
 		IsDel: 1,
 	}

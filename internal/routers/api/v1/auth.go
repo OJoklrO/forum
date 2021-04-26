@@ -16,7 +16,7 @@ type LoginResponse struct {
 // @Produce json
 // @Param body body service.LoginRequest true "body"
 // @Success 200 {object} LoginResponse "success"
-// @Router /account/login [post]
+// @Router /api/v1/account/login [post]
 func Login(c *gin.Context) {
 	param := service.LoginRequest{}
 	errs := app.BindBodyWithValidation(c, &param)
@@ -47,8 +47,8 @@ func Login(c *gin.Context) {
 // @Summary Register.
 // @Produce json
 // @Param body body service.RegisterRequest true "body"
-// @Success 200 {object} MessageResponse "success"
-// @Router /account/register [post]
+// @Success 200 {object} LoginResponse "success"
+// @Router /api/v1/account/register [post]
 func Register(c *gin.Context) {
 	param := service.RegisterRequest{}
 	errors := app.BindBodyWithValidation(c, &param)
@@ -64,14 +64,21 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, MessageResponse{"success."})
+	token, err := app.GenerateJWTToken(param.ID, param.Password)
+	if err != nil {
+		app.ResponseError(c, http.StatusUnauthorized,
+			"app.GenerateJWTToken err: %v"+err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, LoginResponse{token})
 }
 
 // @Summary Delete an account.
 // @Produce json
 // @Param id path string true "id"
 // @Success 200 {object} MessageResponse "success"
-// @Router /account/delete/{id} [delete]
+// @Router /api/v1/account/delete/{id} [delete]
 func DeleteAccount(c *gin.Context) {
 	param := service.DeleteAccountRequest{}
 	param.ID = c.Param("id")

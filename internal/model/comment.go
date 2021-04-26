@@ -47,5 +47,11 @@ func (c *Comment) Delete(db *gorm.DB) error {
 }
 
 func (c Comment) Update(db *gorm.DB) error {
-	return db.Model(c).Where("id = ?", c.ID).Update(&c).Error
+	return db.Model(c).Where("id = ? AND post_id = ?", c.ID, c.PostID).Update(&c).Error
+}
+
+func (c Comment) Get(db *gorm.DB) (*Comment, error) {
+	var comment Comment
+	err := db.Model(comment).Where("id = ? AND post_id = ? AND is_del = ?", c.ID, c.PostID, 0).Find(&comment).Error
+	return &comment, err
 }
