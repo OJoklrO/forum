@@ -29,6 +29,8 @@ type CommentListResponse struct {
 // @Success 200 {object} CommentListResponse "success"
 // @Router /api/v1/comments/{post_id} [get]
 func (comment *Comment) List(c *gin.Context) {
+	// todo: return reply number
+	// todo: return each like number of comments
 	param := service.ListCommentRequest{}
 	postID, err := strconv.Atoi(c.Param("post_id"))
 	if err != nil {
@@ -126,6 +128,7 @@ func (comment *Comment) Delete(c *gin.Context) {
 // @Success 200 {object} MessageResponse "success"
 // @Router /api/v1/comments [put]
 func (comment *Comment) Edit(c *gin.Context) {
+	// todo: mark as edit
 	param := service.EditCommentRequest{}
 	errs := app.BindBodyWithValidation(c, &param)
 	if errs != nil {

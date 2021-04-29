@@ -16,8 +16,9 @@ func (svc *Service) LoginAccount(param *LoginRequest) error {
 }
 
 type RegisterRequest struct {
-	ID       string `form:"id" binding:"required"`
-	Password string `form:"password" binding:"required"`
+	ID         string `form:"id" binding:"required"`
+	Password   string `form:"password" binding:"required"`
+	InviteCode string `form:"invite_code" binding:"required" json:"invite_code"`
 }
 
 func (svc *Service) RegisterAccount(param *RegisterRequest) error {

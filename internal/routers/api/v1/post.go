@@ -22,6 +22,7 @@ func NewPost() Post {
 // @Success 200 {object} model.Post "Post data"
 // @Router /api/v1/posts/{id} [get]
 func (p Post) Get(c *gin.Context) {
+	// todo: reply comments counter in resoponse
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
@@ -53,6 +54,9 @@ type PostListResponse struct {
 // @Success 200 {object} PostListResponse "success"
 // @Router /api/v1/posts [get]
 func (p Post) List(c *gin.Context) {
+	// todo: all posts len
+	// todo: all users len
+	// todo: date(to comments)
 	svc := service.New(c)
 	count, err := svc.CountPosts()
 	if err != nil {
@@ -122,7 +126,6 @@ func (p Post) Create(c *gin.Context) {
 // @Success 200 {object} model.Post "success"
 // @Router /api/v1/posts/{id} [delete]
 func (p Post) Delete(c *gin.Context) {
-	// todo: check permission(admin or owner)
 	param := service.DeletePostRequest{}
 	id, err := strconv.Atoi(c.Param("id"))
 	param.ID = uint32(id)
@@ -140,4 +143,19 @@ func (p Post) Delete(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{})
+}
+
+type PostImageListResponse struct {
+	Posts      []*model.Post `json:"posts"`
+	Images     []string      `json:"images"`
+	TotalPages int           `json:"total_pages"`
+}
+
+// @Summary Get a post image list with pagination settings.
+// @Produce json
+// @Param page query int true "Page number" default(1)
+// @Param page_size query int true "Page size" default(20)
+// @Success 200 {object} PostImageListResponse "success"
+// @Router /api/v1/posts_images [get]
+func (p Post) Images(c *gin.Context) {
 }

@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"forum/global"
 	"forum/internal/service"
 	"forum/pkg/app"
 	"github.com/gin-gonic/gin"
@@ -16,7 +17,7 @@ type LoginResponse struct {
 // @Produce json
 // @Param body body service.LoginRequest true "body"
 // @Success 200 {object} LoginResponse "success"
-// @Router /api/v1/account/login [post]
+// @Router /api/v1/accounts/login [post]
 func Login(c *gin.Context) {
 	param := service.LoginRequest{}
 	errs := app.BindBodyWithValidation(c, &param)
@@ -44,17 +45,24 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, LoginResponse{token})
 }
 
-// @Summary Register.
+// @Summary Register. The invite code is "xduxdu".
 // @Produce json
 // @Param body body service.RegisterRequest true "body"
 // @Success 200 {object} LoginResponse "success"
-// @Router /api/v1/account/register [post]
+// @Router /api/v1/accounts/register [post]
 func Register(c *gin.Context) {
 	param := service.RegisterRequest{}
 	errors := app.BindBodyWithValidation(c, &param)
 	if errors != nil {
 		app.ResponseError(c, http.StatusBadRequest,
 			"Param errors: "+strings.Join(errors.Errors(), ", "))
+		return
+	}
+
+	if param.InviteCode != global.AppSetting.InviteCode {
+		app.ResponseError(c, http.StatusForbidden,
+			"The invite code is not valid")
+		return
 	}
 
 	svc := service.New(c)
@@ -78,7 +86,7 @@ func Register(c *gin.Context) {
 // @Produce json
 // @Param id path string true "id"
 // @Success 200 {object} MessageResponse "success"
-// @Router /api/v1/account/delete/{id} [delete]
+// @Router /api/v1/accounts/{id} [delete]
 func DeleteAccount(c *gin.Context) {
 	param := service.DeleteAccountRequest{}
 	param.ID = c.Param("id")

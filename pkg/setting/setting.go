@@ -40,6 +40,7 @@ type AppSettings struct {
 	LogSavePath    string
 	LogFileName    string
 	LogFileExt     string
+	InviteCode     string
 	StaticPagePath string
 }
 

@@ -18,6 +18,8 @@ func NewRouter() *gin.Engine {
 
 	r.Use(middleware.Translations())
 
+	// todo: an API to return the user count, post number, big image.
+
 	// todo: cors
 	//config := cors.DefaultConfig()
 	//config.AllowAllOrigins = true
@@ -34,11 +36,10 @@ func NewRouter() *gin.Engine {
 
 	apiV1 := r.Group("api/v1")
 	{
-		r.POST("/account/login", v1.Login)
-		r.POST("/account/register", v1.Register)
-		r.DELETE("/account/delete/:id", middleware.JWT(), v1.DeleteAccount)
+		apiV1.POST("/accounts/login", v1.Login)
+		apiV1.POST("/accounts/register", v1.Register)
+		apiV1.DELETE("/accounts/:id", middleware.JWT(), v1.DeleteAccount)
 
-		// todo: jwt
 		post := v1.NewPost()
 		apiV1.GET("/posts", post.List)
 		apiV1.GET("/posts/:id", post.Get)
