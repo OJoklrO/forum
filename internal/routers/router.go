@@ -5,6 +5,7 @@ import (
 	"forum/global"
 	"forum/internal/middleware"
 	v1 "forum/internal/routers/api/v1"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -18,14 +19,15 @@ func NewRouter() *gin.Engine {
 
 	r.Use(middleware.Translations())
 
-	// todo: cors
-	//config := cors.DefaultConfig()
-	//config.AllowAllOrigins = true
-	//config.AllowHeaders = []string{"token", "Authorization", "Content-Type", "Upgrade", "Origin",
-	//	"Connection", "Accept-Encoding", "Accept-Language", "Host", "Access-Control-Request-Method", "Access-Control-Request-Headers"}
-	//config.AllowMethods = []string{"GET", "PUT", "POST", "DELETE"}
-	//config.AllowCredentials = true
-	//r.Use(cors.New(config))
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowHeaders = []string{"token", "Authorization", "Content-Type", "Upgrade", "Origin",
+		"Connection", "Accept-Encoding", "Accept-Language", "Host", "Access-Control-Request-Method", "Access-Control-Request-Headers"}
+	config.AllowMethods = []string{"GET", "PUT", "POST", "DELETE"}
+	config.AllowCredentials = true
+	r.Use(cors.New(config))
+
+	// todo: hot news
 
 	r.Use(static.Serve("/", static.LocalFile(global.AppSetting.StaticPagePath+"/", false)))
 

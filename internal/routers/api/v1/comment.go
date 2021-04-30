@@ -31,7 +31,6 @@ type CommentListResponse struct {
 func (comment *Comment) List(c *gin.Context) {
 	// todo: return reply members
 	// todo: return each like number of comments
-	// todo: return formatted time
 	param := service.ListCommentRequest{}
 	postID, err := strconv.Atoi(c.Param("post_id"))
 	if err != nil {

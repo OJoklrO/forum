@@ -54,8 +54,6 @@ type PostListResponse struct {
 // @Success 200 {object} PostListResponse "success"
 // @Router /api/v1/posts [get]
 func (p Post) List(c *gin.Context) {
-	// todo: all posts len
-	// todo: all users len
 	// todo: date(to comments)
 	svc := service.New(c)
 	count, err := svc.CountPosts()
