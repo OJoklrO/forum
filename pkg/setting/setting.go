@@ -44,7 +44,8 @@ type AppSettings struct {
 	LogFileExt       string
 	InviteCode       string
 	UploadSavePath   string
-	UploadMaxSize    string
+	UploadMaxSize    int
+	UploadApi        string
 	UploadExtensions []string
 }
 

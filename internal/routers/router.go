@@ -6,10 +6,10 @@ import (
 	"forum/internal/middleware"
 	v1 "forum/internal/routers/api/v1"
 	"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"net/http"
 )
 
 func NewRouter() *gin.Engine {
@@ -29,7 +29,8 @@ func NewRouter() *gin.Engine {
 
 	// todo: hot news
 
-	r.Use(static.Serve("/", static.LocalFile(global.AppSetting.StaticPagePath+"/", false)))
+	//r.Use(static.Serve("/", static.LocalFile(global.AppSetting.StaticPagePath+"/", false)))
+	r.StaticFS("/upload", http.Dir(global.AppSetting.UploadSavePath))
 
 	// swagger ui
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -37,6 +38,7 @@ func NewRouter() *gin.Engine {
 	apiV1 := r.Group("api/v1")
 	{
 		apiV1.GET("/forum/info", v1.GetForumInfo)
+		apiV1.POST("/upload", middleware.JWT(), v1.UploadImage)
 
 		apiV1.POST("/accounts/login", v1.Login)
 		apiV1.POST("/accounts/register", v1.Register)
