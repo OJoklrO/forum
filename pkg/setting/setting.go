@@ -31,17 +31,21 @@ func (s *Setting) ReadSection(k string, v interface{}) error {
 
 type ServerSettings struct {
 	RunMode      string
+	Url          string
 	HttpPort     string
 	ReadTimeout  time.Duration
 	WriteTimeout time.Duration
 }
 
 type AppSettings struct {
-	LogSavePath    string
-	LogFileName    string
-	LogFileExt     string
-	InviteCode     string
-	StaticPagePath string
+	StaticPagePath   string
+	LogSavePath      string
+	LogFileName      string
+	LogFileExt       string
+	InviteCode       string
+	UploadSavePath   string
+	UploadMaxSize    string
+	UploadExtensions []string
 }
 
 type DatabaseSettings struct {

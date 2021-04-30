@@ -44,7 +44,7 @@ func (p Post) Get(c *gin.Context) {
 
 type PostListResponse struct {
 	Posts      []*model.Post `json:"posts"`
-	TotalPages int           `json:"total_pages"`
+	TotalPosts int           `json:"total_posts"`
 }
 
 // @Summary Get a post list with pagination settings.
