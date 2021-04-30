@@ -98,7 +98,6 @@ type PostCreateResponse struct {
 // @Router /api/v1/posts [post]
 func (p Post) Create(c *gin.Context) {
 	param := service.CreatePostRequest{}
-	// todo: validator (no value check; no require check for json)
 	errs := app.BindBodyWithValidation(c, &param)
 	if errs != nil {
 		app.ResponseError(c, http.StatusInternalServerError,

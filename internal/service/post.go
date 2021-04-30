@@ -30,8 +30,8 @@ func (svc *Service) GetPostList(page, pageSize int) ([]*model.Post, error) {
 }
 
 type CreatePostRequest struct {
-	Title   string `json:"title" form:"title" binding:"required,min=1,max=100"`
-	Content string `json:"content" form:"content" binding:"required,min=1,max=100"`
+	Title   string `json:"title" form:"title" binding:"required,min=1,max=150"`
+	Content string `json:"content" form:"content" binding:"required,min=1"`
 }
 
 func (svc *Service) CreatePost(param *CreatePostRequest) (post *model.Post, err error) {

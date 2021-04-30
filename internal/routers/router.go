@@ -18,8 +18,6 @@ func NewRouter() *gin.Engine {
 
 	r.Use(middleware.Translations())
 
-	// todo: an API to return the user count, post number, big image.
-
 	// todo: cors
 	//config := cors.DefaultConfig()
 	//config.AllowAllOrigins = true
