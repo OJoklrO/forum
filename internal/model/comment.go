@@ -5,11 +5,13 @@ import (
 )
 
 type Comment struct {
-	ID      uint32 `json:"id"`
-	PostID  uint32 `json:"post_id"`
-	UserID  string `json:"user_id"`
-	Content string `json:"content"`
-	IsDel   bool   `json:"is_del"`
+	ID       uint32 `json:"id"`
+	PostID   uint32 `json:"post_id"`
+	UserID   string `json:"user_id"`
+	Content  string `json:"content"`
+	Time     string `json:"time"`
+	IsDel    bool   `json:"is_del"`
+	IsEdited bool   `json:"is_edited"`
 }
 
 func (c *Comment) TableName() string {

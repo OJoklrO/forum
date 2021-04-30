@@ -2,6 +2,7 @@ package service
 
 import (
 	"forum/internal/model"
+	"time"
 )
 
 type ListCommentRequest struct {
@@ -34,6 +35,7 @@ func (svc *Service) CreateComment(param *CreateCommentRequest) error {
 		UserID:  svc.ctx.Value("user_id").(string),
 		PostID:  param.PostID,
 		Content: param.Content,
+		Time:    time.Now().Format("2006-01-02"),
 	}
 	return c.Create(svc.db)
 }
@@ -46,9 +48,11 @@ type EditCommentRequest struct {
 
 func (svc *Service) EditComment(param *EditCommentRequest) error {
 	c := model.Comment{
-		PostID:  param.PostID,
-		ID:      param.ID,
-		Content: param.Content,
+		PostID:   param.PostID,
+		ID:       param.ID,
+		Content:  param.Content,
+		Time:     time.Now().Format("2006-01-02"),
+		IsEdited: true,
 	}
 	return c.Update(svc.db)
 }
