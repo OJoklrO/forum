@@ -1,8 +1,11 @@
 package service
 
 import (
+	"crypto/md5"
 	"errors"
+	"fmt"
 	"forum/internal/model"
+	"forum/pkg/app"
 )
 
 type LoginRequest struct {
@@ -10,9 +13,20 @@ type LoginRequest struct {
 	Password string `form:"password" binding:"required"`
 }
 
-func (svc *Service) LoginAccount(param *LoginRequest) error {
+func (svc *Service) LoginAccount(param *LoginRequest) (token string, err error) {
+	param.Password = fmt.Sprintf("%x", md5.Sum([]byte(param.Password)))
 	account := model.Account{ID: param.ID, Password: param.Password}
-	return account.Check(svc.db)
+	err = account.Check(svc.db)
+	if err != nil {
+		return "", err
+	}
+
+	token, err = app.GenerateJWTToken(param.ID, param.Password)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }
 
 type RegisterRequest struct {
@@ -21,21 +35,34 @@ type RegisterRequest struct {
 	InviteCode string `form:"invite_code" binding:"required" json:"invite_code"`
 }
 
-func (svc *Service) RegisterAccount(param *RegisterRequest) error {
+func (svc *Service) RegisterAccount(param *RegisterRequest) (token string, err error) {
 	account := model.Account{ID: param.ID}
 	exist, err := account.Exist(svc.db)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if exist {
-		return errors.New("the id is not available")
+		return "", errors.New("the id is not available")
 	}
+
+	param.Password = fmt.Sprintf("%x", md5.Sum([]byte(param.Password)))
 
 	auth := model.Account{
 		ID:       param.ID,
 		Password: param.Password,
 	}
-	return auth.Create(svc.db)
+
+	err = auth.Create(svc.db)
+	if err != nil {
+		return "", err
+	}
+
+	token, err = app.GenerateJWTToken(param.ID, param.Password)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }
 
 type DeleteAccountRequest struct {

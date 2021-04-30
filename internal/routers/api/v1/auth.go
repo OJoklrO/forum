@@ -28,17 +28,10 @@ func Login(c *gin.Context) {
 	}
 
 	svc := service.New(c)
-	err := svc.LoginAccount(&param)
+	token, err := svc.LoginAccount(&param)
 	if err != nil {
 		app.ResponseError(c, http.StatusUnauthorized,
 			"svc.LoginAccount err: "+err.Error())
-		return
-	}
-
-	token, err := app.GenerateJWTToken(param.ID, param.Password)
-	if err != nil {
-		app.ResponseError(c, http.StatusUnauthorized,
-			"app.GenerateJWTToken err: %v"+err.Error())
 		return
 	}
 
@@ -59,6 +52,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
+	// for now, there is only one invite code
 	if param.InviteCode != global.AppSetting.InviteCode {
 		app.ResponseError(c, http.StatusForbidden,
 			"The invite code is not valid")
@@ -66,16 +60,10 @@ func Register(c *gin.Context) {
 	}
 
 	svc := service.New(c)
-	if err := svc.RegisterAccount(&param); err != nil {
+	token, err := svc.RegisterAccount(&param)
+	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.Register: "+err.Error())
-		return
-	}
-
-	token, err := app.GenerateJWTToken(param.ID, param.Password)
-	if err != nil {
-		app.ResponseError(c, http.StatusUnauthorized,
-			"app.GenerateJWTToken err: %v"+err.Error())
 		return
 	}
 
