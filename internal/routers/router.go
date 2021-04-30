@@ -36,9 +36,13 @@ func NewRouter() *gin.Engine {
 
 	apiV1 := r.Group("api/v1")
 	{
+		apiV1.GET("/forum/info", v1.GetForumInfo)
+
 		apiV1.POST("/accounts/login", v1.Login)
 		apiV1.POST("/accounts/register", v1.Register)
 		apiV1.DELETE("/accounts/:id", middleware.JWT(), v1.DeleteAccount)
+		apiV1.GET("/accounts/:id", v1.GetAccountInfo)
+		apiV1.PUT("/accounts", middleware.JWT(), v1.EditAccountInfo)
 
 		post := v1.NewPost()
 		apiV1.GET("/posts", post.List)

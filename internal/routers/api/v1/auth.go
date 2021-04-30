@@ -73,6 +73,7 @@ func Register(c *gin.Context) {
 // @Summary Delete an account.
 // @Produce json
 // @Param id path string true "id"
+// @Param token header string true "jwt token"
 // @Success 200 {object} MessageResponse "success"
 // @Router /api/v1/accounts/{id} [delete]
 func DeleteAccount(c *gin.Context) {

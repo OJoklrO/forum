@@ -16,7 +16,7 @@ type LoginRequest struct {
 func (svc *Service) LoginAccount(param *LoginRequest) (token string, err error) {
 	param.Password = fmt.Sprintf("%x", md5.Sum([]byte(param.Password)))
 	account := model.Account{ID: param.ID, Password: param.Password}
-	err = account.Check(svc.db)
+	err = account.CheckPassword(svc.db)
 	if err != nil {
 		return "", err
 	}
