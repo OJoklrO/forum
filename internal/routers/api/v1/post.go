@@ -10,18 +10,23 @@ import (
 	"strings"
 )
 
-type Post struct{}
+type PostHandler struct{}
 
-func NewPost() Post {
-	return Post{}
+func NewPost() PostHandler {
+	return PostHandler{}
+}
+
+type Post struct {
+	model.Post
+	Vote int `json:"vote"`
 }
 
 // @Summary Get a post by id
 // @Produce json
 // @Param id path int true "Post ID"
-// @Success 200 {object} model.Post "Post data"
+// @Success 200 {object} Post "Post data"
 // @Router /api/v1/posts/{id} [get]
-func (p Post) Get(c *gin.Context) {
+func (p PostHandler) Get(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
@@ -38,12 +43,23 @@ func (p Post) Get(c *gin.Context) {
 			"svc.Get error "+err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, post)
+
+	vote, err := svc.GetVotes(1, post.ID)
+	if err != nil {
+		app.ResponseError(c, http.StatusInternalServerError,
+			"svc.GetVotes error "+err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, Post{
+		Vote: vote,
+		Post: *post,
+	})
 }
 
 type PostListResponse struct {
-	Posts      []*model.Post `json:"posts"`
-	TotalPosts int           `json:"total_posts"`
+	Posts      []Post `json:"posts"`
+	TotalPosts int    `json:"total_posts"`
 }
 
 // @Summary Get a post list with pagination settings.
@@ -52,7 +68,7 @@ type PostListResponse struct {
 // @Param page_size query int true "Page size" default(20)
 // @Success 200 {object} PostListResponse "success"
 // @Router /api/v1/posts [get]
-func (p Post) List(c *gin.Context) {
+func (p PostHandler) List(c *gin.Context) {
 	svc := service.New(c)
 	count, err := svc.CountPosts()
 	if err != nil {
@@ -76,8 +92,22 @@ func (p Post) List(c *gin.Context) {
 		return
 	}
 
+	var respPosts []Post
+	for _, v := range posts {
+		vote, err := svc.GetVotes(1, v.ID)
+		if err != nil {
+			app.ResponseError(c, http.StatusInternalServerError,
+				"svc.GetVotes error "+err.Error())
+			return
+		}
+		respPosts = append(respPosts, Post{
+			Post: *v,
+			Vote: vote,
+		})
+	}
+
 	c.JSON(http.StatusOK, PostListResponse{
-		posts,
+		respPosts,
 		count,
 	})
 }
@@ -92,7 +122,7 @@ type PostCreateResponse struct {
 // @Param token header string true "jwt token"
 // @Success 200 {object} PostCreateResponse "success"
 // @Router /api/v1/posts [post]
-func (p Post) Create(c *gin.Context) {
+func (p PostHandler) Create(c *gin.Context) {
 	param := service.CreatePostRequest{}
 	errs := app.BindBodyWithValidation(c, &param)
 	if errs != nil {
@@ -120,7 +150,7 @@ func (p Post) Create(c *gin.Context) {
 // @Param token header string true "jwt token"
 // @Success 200 {object} model.Post "success"
 // @Router /api/v1/posts/{id} [delete]
-func (p Post) Delete(c *gin.Context) {
+func (p PostHandler) Delete(c *gin.Context) {
 	param := service.DeletePostRequest{}
 	id, err := strconv.Atoi(c.Param("id"))
 	param.ID = uint32(id)
@@ -152,5 +182,5 @@ type PostImageListResponse struct {
 // @Param page_size query int true "Page size" default(20)
 // @Success 200 {object} PostImageListResponse "success"
 // @Router /api/v1/posts_images [get]
-func (p Post) Images(c *gin.Context) {
+func (p PostHandler) Images(c *gin.Context) {
 }

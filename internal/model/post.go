@@ -11,7 +11,7 @@ type Post struct {
 	ReplyUserID  string `json:"reply_user_id"`
 	IsDel        uint8  `json:"is_del"`
 	LatestReply  string `json:"latest_reply"`
-	CommentCount uint32 `json:"comment_countj`
+	CommentCount uint32 `json:"comment_count"`
 }
 
 func (p Post) TableName() string {

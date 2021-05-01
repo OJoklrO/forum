@@ -35,7 +35,7 @@ type CommentListResponse struct {
 // @Success 200 {object} CommentListResponse "success"
 // @Router /api/v1/comments/{post_id} [get]
 func (comment *CommentHandler) List(c *gin.Context) {
-	// todo: return each like number of comments
+	// todo: return like status depending on jwt (user)
 	param := service.ListCommentRequest{}
 	postID, err := strconv.Atoi(c.Param("post_id"))
 	if err != nil {
