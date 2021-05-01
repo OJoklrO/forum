@@ -109,7 +109,7 @@ func (svc *Service) GetComment(id, postId uint32) (*model.Comment, error) {
 	return c.Get(svc.db)
 }
 
-func (svc *Service) Vote(id, postId uint32, support bool) error {
+func (svc *Service) Vote(id, postId uint32, support int) error {
 	v := &model.Vote{
 		UserID:    svc.ctx.Value("user_id").(string),
 		PostID:    postId,
@@ -125,5 +125,5 @@ func (svc *Service) GetVotes(id, postId uint32) (int, error) {
 		PostID:    postId,
 		CommentID: id,
 	}
-	return v.Count(svc.db)
+	return v.Sum(svc.db)
 }

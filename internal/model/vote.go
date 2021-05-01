@@ -9,7 +9,7 @@ type Vote struct {
 	UserID    string `json:"user_id"`
 	PostID    uint32 `json:"post_id"`
 	CommentID uint32 `json:"comment_id"`
-	Vote      bool   `json:"vote"`
+	Vote      int    `json:"vote"`
 }
 
 func (v *Vote) TableName() string {
@@ -30,8 +30,14 @@ func (v *Vote) Get(db *gorm.DB) error {
 	return db.Model(v).Where("user_id = ? AND post_id = ? AND comment_id = ?", v.UserID, v.PostID, v.CommentID).Find(v).Error
 }
 
-func (v *Vote) Count(db *gorm.DB) (count int, err error) {
-	result := db.Model(v).Where("post_id = ? AND comment_id = ?", v.PostID, v.CommentID).Count(&count)
+type sumResult struct {
+	Total int
+}
+
+func (v *Vote) Sum(db *gorm.DB) (count int, err error) {
+	var sum sumResult
+	result := db.Model(v).Select("sum(vote) as total").Where("post_id = ? AND comment_id = ?", v.PostID, v.CommentID).Scan(&sum)
+	count = sum.Total
 	err = result.Error
 	return
 }

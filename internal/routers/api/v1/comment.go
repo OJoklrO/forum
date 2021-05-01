@@ -208,7 +208,7 @@ func (comment *CommentHandler) Get(c *gin.Context) {
 // @Produce json
 // @Param post_id path int true "post id"
 // @Param id path int true "comment id"
-// @Param support path int true "0 or 1"
+// @Param support path int true "-1 or 1"
 // @Param token header string true "jwt token"
 // @Success 200 {object} MessageResponse "success"
 // @Router /api/v1/comments/{post_id}/{id}/vote/{support} [get]
@@ -220,18 +220,14 @@ func (comment *CommentHandler) Vote(c *gin.Context) {
 		app.ResponseError(c, http.StatusBadRequest, "param error.")
 		return
 	}
-	var support bool
-	if supportValue == 0 {
-		support = false
-	} else if supportValue == 1 {
-		support = true
-	} else {
-		app.ResponseError(c, http.StatusBadRequest, "vote 'support' param should be 0 or 1.")
+
+	if !(supportValue == -1 || supportValue == 1) {
+		app.ResponseError(c, http.StatusBadRequest, "vote 'support' param should be -1 or 1.")
 		return
 	}
 
 	svc := service.New(c)
-	err := svc.Vote(uint32(id), uint32(postId), support)
+	err := svc.Vote(uint32(id), uint32(postId), supportValue)
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.Vote err: "+err.Error())
