@@ -18,7 +18,16 @@ func (c *Comment) TableName() string {
 	return "comment"
 }
 
-func (c *Comment) Count(db *gorm.DB) (int, error) {
+func (c *Comment) CountByUserId(db *gorm.DB) (int, error) {
+	var count int
+	err := db.Model(&Comment{}).Where("user_id = ? AND is_del = ?", c.UserID, 0).Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (c *Comment) CountByPostId(db *gorm.DB) (int, error) {
 	var count int
 	err := db.Model(&Comment{}).Where("post_id = ? AND is_del = ?", c.PostID, 0).Count(&count).Error
 	if err != nil {

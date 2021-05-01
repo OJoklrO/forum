@@ -11,16 +11,25 @@ type Post struct {
 	ReplyUserID  string `json:"reply_user_id"`
 	IsDel        uint8  `json:"is_del"`
 	LatestReply  string `json:"latest_reply"`
-	CommentCount uint32 `json:"comment_count"`
+	CommentCount uint32 `json:"comment_countj`
 }
 
 func (p Post) TableName() string {
 	return "post"
 }
 
-func (p Post) Count(db *gorm.DB) (int, error) {
+func (p Post) CountAll(db *gorm.DB) (int, error) {
 	var count int
 	err := db.Model(&p).Where("is_del = ?", 0).Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (p *Post) CountByUser(db *gorm.DB) (int, error) {
+	var count int
+	err := db.Model(p).Where("is_del = ? AND user_id = ?", 0, p.UserID).Count(&count).Error
 	if err != nil {
 		return 0, err
 	}

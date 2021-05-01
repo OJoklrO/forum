@@ -22,9 +22,6 @@ func GetAccountInfo(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, account)
-
-	// todo: post number of a user
-	// todo: reply number of a user
 	// todo: user level
 }
 

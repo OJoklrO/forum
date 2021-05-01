@@ -6,7 +6,7 @@ import (
 
 func (svc *Service) CountPosts() (int, error) {
 	p := model.Post{}
-	return p.Count(svc.db)
+	return p.CountAll(svc.db)
 }
 
 type GetPostRequest struct {

@@ -40,7 +40,7 @@ func (comment *Comment) List(c *gin.Context) {
 	param.PostID = uint32(postID)
 
 	svc := service.New(c)
-	commentCount, err := svc.CountComments(param.PostID)
+	commentCount, err := svc.CountCommentsOfPost(param.PostID)
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.CountComments err: "+err.Error())

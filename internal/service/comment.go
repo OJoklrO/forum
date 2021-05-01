@@ -5,11 +5,11 @@ import (
 	"time"
 )
 
-func (svc *Service) CountComments(postId uint32) (int, error) {
+func (svc *Service) CountCommentsOfPost(postId uint32) (int, error) {
 	c := model.Comment{
 		PostID: postId,
 	}
-	return c.Count(svc.db)
+	return c.CountByPostId(svc.db)
 }
 
 type ListCommentRequest struct {
@@ -49,7 +49,7 @@ func (svc *Service) CreateComment(param *CreateCommentRequest) error {
 		return err
 	}
 
-	count, err := svc.CountComments(param.PostID)
+	count, err := svc.CountCommentsOfPost(param.PostID)
 	if err != nil {
 		return err
 	}

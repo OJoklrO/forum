@@ -3,30 +3,44 @@ package service
 import "forum/internal/model"
 
 type AccountInfo struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Gender      uint32 `json:"gender"`
-	Avatar      string `json:"avatar"`
-	Description string `json:"description"`
-	Level       uint32 `json:"level"`
+	ID           string `json:"id"`
+	Name         string `json:"name"`
+	Gender       uint32 `json:"gender"`
+	Avatar       string `json:"avatar"`
+	Description  string `json:"description"`
+	Level        uint32 `json:"level"`
+	CommentCount int    `json:"comment_count"`
+	PostCount    int    `json:"post_count"`
 }
 
 func (svc *Service) GetUserInfo(id string) (*AccountInfo, error) {
-	res := model.Account{
+	account := model.Account{
 		ID: id,
 	}
-	err := res.Get(svc.db)
+	err := account.Get(svc.db)
+	if err != nil {
+		return nil, err
+	}
+
+	commentCount, err := svc.CountCommentsOfUser(id)
+	if err != nil {
+		return nil, err
+	}
+
+	postCount, err := svc.CountPostsOfUser(id)
 	if err != nil {
 		return nil, err
 	}
 
 	return &AccountInfo{
-		ID:          res.ID,
-		Name:        res.Name,
-		Gender:      res.Gender,
-		Avatar:      res.Avatar,
-		Description: res.Description,
-		Level:       res.Level,
+		ID:           account.ID,
+		Name:         account.Name,
+		Gender:       account.Gender,
+		Avatar:       account.Avatar,
+		Description:  account.Description,
+		Level:        account.Level,
+		CommentCount: commentCount,
+		PostCount:    postCount,
 	}, nil
 }
 
@@ -52,4 +66,18 @@ func (svc *Service) EditUserInfo(param *EditAccountInfoRequest) error {
 	}
 
 	return account.Update(svc.db)
+}
+
+func (svc *Service) CountCommentsOfUser(userId string) (int, error) {
+	c := model.Comment{
+		UserID: userId,
+	}
+	return c.CountByUserId(svc.db)
+}
+
+func (svc *Service) CountPostsOfUser(userId string) (int, error) {
+	post := model.Post{
+		UserID: userId,
+	}
+	return post.CountByUser(svc.db)
 }
