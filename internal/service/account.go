@@ -1,6 +1,8 @@
 package service
 
-import "forum/internal/model"
+import (
+	"forum/internal/model"
+)
 
 type AccountInfo struct {
 	ID           string `json:"id"`
@@ -80,4 +82,51 @@ func (svc *Service) CountPostsOfUser(userId string) (int, error) {
 		UserID: userId,
 	}
 	return post.CountByUser(svc.db)
+}
+
+func (svc *Service) UpdateUserLevel() error {
+	id := svc.ctx.Value("user_id").(string)
+
+	commentCount, err := svc.CountCommentsOfUser(id)
+	if err != nil {
+		return err
+	}
+
+	postCount, err := svc.CountPostsOfUser(id)
+	if err != nil {
+		return err
+	}
+	vote := model.Vote{UserID: id}
+	voteSum, err := vote.UserSum(svc.db)
+	if err != nil {
+		return err
+	}
+
+	checks, err := svc.GetCheckInRecords(id)
+	if err != nil {
+		return err
+	}
+	checkCount := 0
+	for _, v := range checks {
+		if v {
+			checkCount++
+		}
+	}
+
+	score := postCount*3 + commentCount*2 + checkCount*10 + voteSum*5
+	var level uint32
+	if score > 350 {
+		level = 5
+	} else if score > 250 {
+		level = 4
+	} else if score > 100 {
+		level = 3
+	} else if score > 25 {
+		level = 2
+	} else {
+		level = 1
+	}
+
+	account := model.Account{ID: id, Level: level}
+	return account.Update(svc.db)
 }

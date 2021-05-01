@@ -3,6 +3,7 @@ package v1
 import (
 	"forum/global"
 	"forum/internal/model"
+	"forum/internal/service"
 	"forum/pkg/app"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -15,24 +16,14 @@ import (
 // @Success 200 {object} []bool "success"
 // @Router /api/v1/checkin/records [get]
 func GetCheckInRecords(c *gin.Context) {
-	check := model.Checkin{ID: c.Value("user_id").(string)}
-	results, err := check.GetThisMonth(global.DBEngine)
-
+	svc := service.New(c)
+	checks, err := svc.GetCheckInRecords(c.Value("user_id").(string))
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
-			err.Error())
-		return
+			"svc.GetCheckInRecords: "+err.Error())
 	}
 
-	tmpT := time.Date(time.Now().Year(), time.Now().Month()+1, 0, 0, 0, 0, 0, time.UTC)
-	checkResp := make([]bool, tmpT.Day())
-	for i := range results {
-		if results[i].Month == int(time.Now().Month()) {
-			checkResp[results[i].Day-1] = true
-		}
-	}
-
-	c.JSON(http.StatusOK, checkResp)
+	c.JSON(http.StatusOK, checks)
 }
 
 // @Summary Check in.
@@ -52,6 +43,14 @@ func CheckIn(c *gin.Context) {
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			err.Error())
+		return
+	}
+
+	svc := service.New(c)
+	err = svc.UpdateUserLevel()
+	if err != nil {
+		app.ResponseError(c, http.StatusInternalServerError,
+			"svc.UpdateUserLevel: "+err.Error())
 		return
 	}
 

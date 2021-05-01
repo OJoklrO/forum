@@ -54,6 +54,11 @@ func (svc *Service) CreateComment(param *CreateCommentRequest) error {
 		return err
 	}
 
+	err = svc.UpdateUserLevel()
+	if err != nil {
+		return err
+	}
+
 	post := model.Post{
 		ID:           param.PostID,
 		LatestReply:  c.Time,
@@ -125,5 +130,5 @@ func (svc *Service) GetVotes(id, postId uint32) (int, error) {
 		PostID:    postId,
 		CommentID: id,
 	}
-	return v.Sum(svc.db)
+	return v.CommentSum(svc.db)
 }
