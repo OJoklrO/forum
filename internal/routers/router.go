@@ -29,6 +29,7 @@ func NewRouter() *gin.Engine {
 
 	// todo: hot news
 
+	// todo: serve static page on "/"
 	//r.Use(static.Serve("/", static.LocalFile(global.AppSetting.StaticPagePath+"/", false)))
 	r.StaticFS("/upload", http.Dir(global.AppSetting.UploadSavePath))
 

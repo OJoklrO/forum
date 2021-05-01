@@ -17,8 +17,9 @@ func NewComment() Comment {
 }
 
 type CommentListResponse struct {
-	Comments      []*model.Comment `json:"comments"`
-	TotalComments int              `json:"total_comments"`
+	Comments     []*model.Comment `json:"comments"`
+	CommentCount int              `json:"comment_count"`
+	UserCount    int              `json:"user_count"`
 }
 
 // @Summary Get a comment list by the post id.
@@ -29,7 +30,6 @@ type CommentListResponse struct {
 // @Success 200 {object} CommentListResponse "success"
 // @Router /api/v1/comments/{post_id} [get]
 func (comment *Comment) List(c *gin.Context) {
-	// todo: return reply members
 	// todo: return each like number of comments
 	param := service.ListCommentRequest{}
 	postID, err := strconv.Atoi(c.Param("post_id"))
@@ -40,10 +40,16 @@ func (comment *Comment) List(c *gin.Context) {
 	param.PostID = uint32(postID)
 
 	svc := service.New(c)
-	totalComments, err := svc.CountComments(&service.ListCommentRequest{PostID: param.PostID})
+	commentCount, err := svc.CountComments(&service.ListCommentRequest{PostID: param.PostID})
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.CountComments err: "+err.Error())
+		return
+	}
+	userCount, err := svc.CountCommentUsers(&service.ListCommentRequest{PostID: param.PostID})
+	if err != nil {
+		app.ResponseError(c, http.StatusInternalServerError,
+			"svc.CountCommentUsers err: "+err.Error())
 		return
 	}
 
@@ -63,7 +69,8 @@ func (comment *Comment) List(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, CommentListResponse{
 		comments,
-		totalComments,
+		commentCount,
+		userCount,
 	})
 }
 
@@ -128,7 +135,6 @@ func (comment *Comment) Delete(c *gin.Context) {
 // @Success 200 {object} MessageResponse "success"
 // @Router /api/v1/comments [put]
 func (comment *Comment) Edit(c *gin.Context) {
-	// todo: mark as edit
 	param := service.EditCommentRequest{}
 	errs := app.BindBodyWithValidation(c, &param)
 	if errs != nil {

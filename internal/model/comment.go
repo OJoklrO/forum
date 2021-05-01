@@ -27,6 +27,15 @@ func (c *Comment) Count(db *gorm.DB) (int, error) {
 	return count, nil
 }
 
+func (c *Comment) CountUsers(db *gorm.DB) (int, error) {
+	var count int
+	err := db.Model(&Comment{}).Where("post_id = ?", c.PostID).Group("user_id").Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
 func (c *Comment) List(db *gorm.DB, pageOffset, pageSize int) ([]*Comment, error) {
 	var comments []*Comment
 	var err error

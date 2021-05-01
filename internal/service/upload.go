@@ -12,12 +12,7 @@ import (
 	"strconv"
 )
 
-type FileInfo struct {
-	Name string
-	Url  string
-}
-
-func (svc *Service) Upload(file multipart.File, fileHeader *multipart.FileHeader) (*FileInfo, error) {
+func (svc *Service) Upload(file multipart.File, fileHeader *multipart.FileHeader) (string, error) {
 	ext := path.Ext(fileHeader.Filename)
 	// check file type
 	allow := false
@@ -28,7 +23,7 @@ func (svc *Service) Upload(file multipart.File, fileHeader *multipart.FileHeader
 		}
 	}
 	if !allow {
-		return nil, errors.New("the file type is not allowed")
+		return "", errors.New("the file type is not allowed")
 	}
 
 	// unique file name
@@ -44,25 +39,21 @@ func (svc *Service) Upload(file multipart.File, fileHeader *multipart.FileHeader
 
 	err := os.MkdirAll(global.AppSetting.UploadSavePath, os.ModePerm)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	// size
 	content, _ := ioutil.ReadAll(file)
 	if len(content) > global.AppSetting.UploadMaxSize*1024*1024 {
-		return nil, errors.New("exceeded max file size: " +
+		return "", errors.New("exceeded max file size: " +
 			strconv.Itoa(global.AppSetting.UploadMaxSize) + "M")
 	}
 
 	err = ioutil.WriteFile(dstPath, content, os.ModePerm)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	url := global.ServerSetting.Url + global.AppSetting.UploadApi + "/" +
-		fileName
-	return &FileInfo{
-		Name: fileName,
-		Url:  url,
-	}, nil
+	return global.ServerSetting.Url + global.AppSetting.UploadApi + "/" +
+		fileName, nil
 }

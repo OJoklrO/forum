@@ -7,19 +7,11 @@ import (
 	"net/http"
 )
 
-type UploadImageResponse struct {
-	Url string `json:"url"`
-}
-
-type UploadImageRequest struct {
-	Todo string `json:"todo"`
-}
-
 // @Summary Upload.
 // @Produce json
 // @Param file formData file true "image file"
 // @Param token header string true "jwt token"
-// @Success 200 {object} UploadImageResponse "success"
+// @Success 200 {string} string "success"
 // @Router /api/v1/upload [post]
 func UploadImage(c *gin.Context) {
 	file, fileHeader, err := c.Request.FormFile("file")

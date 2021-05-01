@@ -16,6 +16,13 @@ func (svc *Service) CountComments(param *ListCommentRequest) (int, error) {
 	return c.Count(svc.db)
 }
 
+func (svc *Service) CountCommentUsers(param *ListCommentRequest) (int, error) {
+	c := model.Comment{
+		PostID: param.PostID,
+	}
+	return c.CountUsers(svc.db)
+}
+
 func (svc *Service) ListComment(param *ListCommentRequest, page, pageSize int) ([]*model.Comment, error) {
 	c := model.Comment{PostID: param.PostID}
 	pageOffset := 0
