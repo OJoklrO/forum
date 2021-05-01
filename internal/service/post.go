@@ -69,5 +69,5 @@ func (svc *Service) DeletePost(param *DeletePostRequest) error {
 		ID:    param.ID,
 		IsDel: 1,
 	}
-	return p.Update(svc.db, p)
+	return p.Update(svc.db)
 }

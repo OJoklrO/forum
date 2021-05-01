@@ -5,10 +5,13 @@ import (
 )
 
 type Post struct {
-	ID     uint32 `gorm:"primary_key" json:"id"`
-	Title  string `json:"title"`
-	UserID string `json:"user_id"`
-	IsDel  uint8  `json:"is_del"`
+	ID           uint32 `gorm:"primary_key" json:"id"`
+	Title        string `json:"title"`
+	UserID       string `json:"user_id"`
+	ReplyUserID  string `json:"reply_user_id"`
+	IsDel        uint8  `json:"is_del"`
+	LatestReply  string `json:"latest_reply"`
+	CommentCount uint32 `json:"comment_count"`
 }
 
 func (p Post) TableName() string {
@@ -50,6 +53,6 @@ func (p Post) Create(db *gorm.DB) (*Post, error) {
 	return db.Value.(*Post), nil
 }
 
-func (p Post) Update(db *gorm.DB, v interface{}) error {
-	return db.Model(&Post{}).Where("id = ?", p.ID).Updates(v).Error
+func (p *Post) Update(db *gorm.DB) error {
+	return db.Model(&Post{}).Where("id = ?", p.ID).Updates(p).Error
 }

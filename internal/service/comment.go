@@ -5,15 +5,15 @@ import (
 	"time"
 )
 
-type ListCommentRequest struct {
-	PostID uint32 `form:"post_id" binding:"required,gte=1"`
-}
-
-func (svc *Service) CountComments(param *ListCommentRequest) (int, error) {
+func (svc *Service) CountComments(postId uint32) (int, error) {
 	c := model.Comment{
-		PostID: param.PostID,
+		PostID: postId,
 	}
 	return c.Count(svc.db)
+}
+
+type ListCommentRequest struct {
+	PostID uint32 `form:"post_id" binding:"required,gte=1"`
 }
 
 func (svc *Service) CountCommentUsers(param *ListCommentRequest) (int, error) {
@@ -44,7 +44,23 @@ func (svc *Service) CreateComment(param *CreateCommentRequest) error {
 		Content: param.Content,
 		Time:    time.Now().Format("2006-01-02"),
 	}
-	return c.Create(svc.db)
+	err := c.Create(svc.db)
+	if err != nil {
+		return err
+	}
+
+	count, err := svc.CountComments(param.PostID)
+	if err != nil {
+		return err
+	}
+
+	post := model.Post{
+		ID:           param.PostID,
+		LatestReply:  c.Time,
+		ReplyUserID:  svc.ctx.Value("user_id").(string),
+		CommentCount: uint32(count),
+	}
+	return post.Update(svc.db)
 }
 
 type EditCommentRequest struct {
@@ -61,7 +77,16 @@ func (svc *Service) EditComment(param *EditCommentRequest) error {
 		Time:     time.Now().Format("2006-01-02"),
 		IsEdited: true,
 	}
-	return c.Update(svc.db)
+	err := c.Update(svc.db)
+	if err != nil {
+		return err
+	}
+	post := model.Post{
+		ID:          param.PostID,
+		LatestReply: c.Time,
+		ReplyUserID: svc.ctx.Value("user_id").(string),
+	}
+	return post.Update(svc.db)
 }
 
 type LocateCommentRequest struct {

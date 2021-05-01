@@ -22,7 +22,6 @@ func NewPost() Post {
 // @Success 200 {object} model.Post "Post data"
 // @Router /api/v1/posts/{id} [get]
 func (p Post) Get(c *gin.Context) {
-	// todo: reply comments counter in resoponse
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
@@ -54,7 +53,6 @@ type PostListResponse struct {
 // @Success 200 {object} PostListResponse "success"
 // @Router /api/v1/posts [get]
 func (p Post) List(c *gin.Context) {
-	// todo: date(to comments)
 	svc := service.New(c)
 	count, err := svc.CountPosts()
 	if err != nil {
@@ -148,7 +146,7 @@ type PostImageListResponse struct {
 	TotalPages int           `json:"total_pages"`
 }
 
-// @Summary Get a post image list with pagination settings.
+// @Summary (Todo)Get a post image list with pagination settings.
 // @Produce json
 // @Param page query int true "Page number" default(1)
 // @Param page_size query int true "Page size" default(20)
