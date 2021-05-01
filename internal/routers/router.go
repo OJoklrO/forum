@@ -60,6 +60,9 @@ func NewRouter() *gin.Engine {
 		apiV1.DELETE("/comments/:post_id/:id", middleware.JWT(), comment.Delete)
 		apiV1.GET("/comments/:post_id/:id", comment.Get)
 		apiV1.GET("/comments/:post_id/:id/vote/:support", middleware.JWT(), comment.Vote)
+
+		apiV1.GET("/checkin", middleware.JWT(), v1.CheckIn)
+		apiV1.GET("/checkin/records", middleware.JWT(), v1.GetCheckInRecords)
 	}
 
 	return r
