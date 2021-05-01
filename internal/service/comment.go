@@ -89,13 +89,8 @@ func (svc *Service) EditComment(param *EditCommentRequest) error {
 	return post.Update(svc.db)
 }
 
-type LocateCommentRequest struct {
-	ID     uint32 `form:"id" binding:"required,gte=1"`
-	PostID uint32 `form:"post_id" binding:"required,gte=1"`
-}
-
-func (svc *Service) DeleteComment(param *LocateCommentRequest) error {
-	comment, err := svc.GetComment(param)
+func (svc *Service) DeleteComment(id, postId uint32) error {
+	comment, err := svc.GetComment(id, postId)
 	if err != nil {
 		return err
 	}
@@ -106,10 +101,21 @@ func (svc *Service) DeleteComment(param *LocateCommentRequest) error {
 	return comment.Delete(svc.db)
 }
 
-func (svc *Service) GetComment(param *LocateCommentRequest) (*model.Comment, error) {
+func (svc *Service) GetComment(id, postId uint32) (*model.Comment, error) {
 	c := model.Comment{
-		ID:     param.ID,
-		PostID: param.PostID,
+		ID:     id,
+		PostID: postId,
 	}
 	return c.Get(svc.db)
+}
+
+func (svc *Service) Vote(id, postId uint32, support bool) error {
+	v := &model.Vote{
+		UserID:    svc.ctx.Value("user_id").(string),
+		PostID:    postId,
+		CommentID: id,
+		Vote:      support,
+	}
+
+	return v.SetOrCreate(svc.db)
 }
