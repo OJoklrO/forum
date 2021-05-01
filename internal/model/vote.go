@@ -29,3 +29,9 @@ func (v *Vote) SetOrCreate(db *gorm.DB) error {
 func (v *Vote) Get(db *gorm.DB) error {
 	return db.Model(v).Where("user_id = ? AND post_id = ? AND comment_id = ?", v.UserID, v.PostID, v.CommentID).Find(v).Error
 }
+
+func (v *Vote) Count(db *gorm.DB) (count int, err error) {
+	result := db.Model(v).Where("post_id = ? AND comment_id = ?", v.PostID, v.CommentID).Count(&count)
+	err = result.Error
+	return
+}

@@ -119,3 +119,11 @@ func (svc *Service) Vote(id, postId uint32, support bool) error {
 
 	return v.SetOrCreate(svc.db)
 }
+
+func (svc *Service) GetVotes(id, postId uint32) (int, error) {
+	v := &model.Vote{
+		PostID:    postId,
+		CommentID: id,
+	}
+	return v.Count(svc.db)
+}

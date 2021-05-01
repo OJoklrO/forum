@@ -10,16 +10,21 @@ import (
 	"strings"
 )
 
-type Comment struct{}
+type CommentHandler struct{}
 
-func NewComment() Comment {
-	return Comment{}
+func NewComment() CommentHandler {
+	return CommentHandler{}
+}
+
+type Comment struct {
+	model.Comment
+	Vote int `json:"vote"`
 }
 
 type CommentListResponse struct {
-	Comments     []*model.Comment `json:"comments"`
-	CommentCount int              `json:"comment_count"`
-	UserCount    int              `json:"user_count"`
+	Comments     []Comment `json:"comments"`
+	CommentCount int       `json:"comment_count"`
+	UserCount    int       `json:"user_count"`
 }
 
 // @Summary Get a comment list by the post id.
@@ -29,7 +34,7 @@ type CommentListResponse struct {
 // @Param page_size query int true "page size" default(20)
 // @Success 200 {object} CommentListResponse "success"
 // @Router /api/v1/comments/{post_id} [get]
-func (comment *Comment) List(c *gin.Context) {
+func (comment *CommentHandler) List(c *gin.Context) {
 	// todo: return each like number of comments
 	param := service.ListCommentRequest{}
 	postID, err := strconv.Atoi(c.Param("post_id"))
@@ -67,8 +72,23 @@ func (comment *Comment) List(c *gin.Context) {
 			"svc.ListComment err: "+err.Error())
 		return
 	}
+
+	var respComments []Comment
+	for _, v := range comments {
+		vote, err := svc.GetVotes(v.ID, v.PostID)
+		if err != nil {
+			app.ResponseError(c, http.StatusInternalServerError,
+				"svc.GetVotes err: "+err.Error())
+			return
+		}
+		newItem := Comment{
+			Vote:    vote,
+			Comment: *v,
+		}
+		respComments = append(respComments, newItem)
+	}
 	c.JSON(http.StatusOK, CommentListResponse{
-		comments,
+		respComments,
 		commentCount,
 		userCount,
 	})
@@ -80,7 +100,7 @@ func (comment *Comment) List(c *gin.Context) {
 // @Param token header string true "jwt token"
 // @Success 200 {object} MessageResponse "success"
 // @Router /api/v1/comments [post]
-func (comment *Comment) Create(c *gin.Context) {
+func (comment *CommentHandler) Create(c *gin.Context) {
 	param := service.CreateCommentRequest{}
 	errs := app.BindBodyWithValidation(c, &param)
 	if errs != nil {
@@ -107,7 +127,7 @@ func (comment *Comment) Create(c *gin.Context) {
 // @Param token header string true "jwt token"
 // @Success 200 {object} MessageResponse "success"
 // @Router /api/v1/comments/{post_id}/{id} [delete]
-func (comment *Comment) Delete(c *gin.Context) {
+func (comment *CommentHandler) Delete(c *gin.Context) {
 	id, errId := strconv.Atoi(c.Param("id"))
 	postId, errPost := strconv.Atoi(c.Param("post_id"))
 	if errId != nil || errPost != nil {
@@ -130,7 +150,7 @@ func (comment *Comment) Delete(c *gin.Context) {
 // @Param token header string true "jwt token"
 // @Success 200 {object} MessageResponse "success"
 // @Router /api/v1/comments [put]
-func (comment *Comment) Edit(c *gin.Context) {
+func (comment *CommentHandler) Edit(c *gin.Context) {
 	param := service.EditCommentRequest{}
 	errs := app.BindBodyWithValidation(c, &param)
 	if errs != nil {
@@ -150,13 +170,13 @@ func (comment *Comment) Edit(c *gin.Context) {
 	c.JSON(http.StatusOK, MessageResponse{"success."})
 }
 
-// @Summary Delete a comment.
+// @Summary Get a single comment.
 // @Produce json
 // @Param post_id path int true "post id"
 // @Param id path int true "comment id"
 // @Success 200 {object} model.Comment "success"
 // @Router /api/v1/comments/{post_id}/{id} [get]
-func (comment *Comment) Get(c *gin.Context) {
+func (comment *CommentHandler) Get(c *gin.Context) {
 	id, errId := strconv.Atoi(c.Param("id"))
 	postId, errPost := strconv.Atoi(c.Param("post_id"))
 	if errId != nil || errPost != nil {
@@ -170,7 +190,18 @@ func (comment *Comment) Get(c *gin.Context) {
 			"svc.GetComment err: "+err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, targetComment)
+
+	vote, err := svc.GetVotes(uint32(id), uint32(postId))
+	if err != nil {
+		app.ResponseError(c, http.StatusInternalServerError,
+			"svc.GetVotes err: "+err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, Comment{
+		Comment: *targetComment,
+		Vote:    vote,
+	})
 }
 
 // @Summary Vote on a comment.
@@ -181,7 +212,7 @@ func (comment *Comment) Get(c *gin.Context) {
 // @Param token header string true "jwt token"
 // @Success 200 {object} MessageResponse "success"
 // @Router /api/v1/comments/{post_id}/{id}/vote/{support} [get]
-func (comment *Comment) Vote(c *gin.Context) {
+func (comment *CommentHandler) Vote(c *gin.Context) {
 	id, errId := strconv.Atoi(c.Param("id"))
 	postId, errPost := strconv.Atoi(c.Param("post_id"))
 	supportValue, errVote := strconv.Atoi(c.Param("support"))
