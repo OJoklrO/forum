@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 type CommentHandler struct{}
@@ -108,10 +107,11 @@ type CreateCommentResponse struct {
 // @Router /api/v1/comments [post]
 func (comment *CommentHandler) Create(c *gin.Context) {
 	param := service.CreateCommentRequest{}
-	errs := app.BindBodyWithValidation(c, &param)
-	if errs != nil {
+
+	err := c.ShouldBind(&param)
+	if err != nil {
 		app.ResponseError(c, http.StatusBadRequest,
-			"BindBodyWithValidation errs: "+strings.Join(errs.Errors(), ", "))
+			err.Error())
 		return
 	}
 
@@ -158,15 +158,16 @@ func (comment *CommentHandler) Delete(c *gin.Context) {
 // @Router /api/v1/comments [put]
 func (comment *CommentHandler) Edit(c *gin.Context) {
 	param := service.EditCommentRequest{}
-	errs := app.BindBodyWithValidation(c, &param)
-	if errs != nil {
+
+	err := c.ShouldBind(&param)
+	if err != nil {
 		app.ResponseError(c, http.StatusBadRequest,
-			"BindBodyWithValidation errs: "+strings.Join(errs.Errors(), ", "))
+			err.Error())
 		return
 	}
 
 	svc := service.New(c)
-	err := svc.EditComment(&param)
+	err = svc.EditComment(&param)
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.EditComment err: "+err.Error())

@@ -6,7 +6,6 @@ import (
 	"forum/pkg/app"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"strings"
 )
 
 type LoginResponse struct {
@@ -20,10 +19,11 @@ type LoginResponse struct {
 // @Router /api/v1/accounts/login [post]
 func Login(c *gin.Context) {
 	param := service.LoginRequest{}
-	errs := app.BindBodyWithValidation(c, &param)
-	if errs != nil {
+
+	err := c.ShouldBind(&param)
+	if err != nil {
 		app.ResponseError(c, http.StatusBadRequest,
-			"app.BindBodyWithValidation errs: "+strings.Join(errs.Errors(), ","))
+			err.Error())
 		return
 	}
 
@@ -45,10 +45,11 @@ func Login(c *gin.Context) {
 // @Router /api/v1/accounts/register [post]
 func Register(c *gin.Context) {
 	param := service.RegisterRequest{}
-	errors := app.BindBodyWithValidation(c, &param)
-	if errors != nil {
+
+	err := c.ShouldBind(&param)
+	if err != nil {
 		app.ResponseError(c, http.StatusBadRequest,
-			"Param errors: "+strings.Join(errors.Errors(), ", "))
+			err.Error())
 		return
 	}
 
@@ -78,15 +79,16 @@ func Register(c *gin.Context) {
 // @Router /api/v1/accounts/reset-password [post]
 func ResetPassword(c *gin.Context) {
 	param := service.ResetPasswordRequest{}
-	errs := app.BindBodyWithValidation(c, &param)
-	if errs != nil {
+
+	err := c.ShouldBind(&param)
+	if err != nil {
 		app.ResponseError(c, http.StatusBadRequest,
-			"app.BindBodyWithValidation errs: "+strings.Join(errs.Errors(), ","))
+			err.Error())
 		return
 	}
 
 	svc := service.New(c)
-	err := svc.ResetPassword(&param)
+	err = svc.ResetPassword(&param)
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.ResetPassword err: "+err.Error())

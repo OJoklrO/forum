@@ -5,7 +5,6 @@ import (
 	"forum/pkg/app"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"strings"
 )
 
 // @Summary Get account information
@@ -54,14 +53,14 @@ func GetMyAccountInfo(c *gin.Context) {
 func EditAccountInfo(c *gin.Context) {
 	svc := service.New(c)
 	var param service.EditAccountInfoRequest
-	errs := app.BindBodyWithValidation(c, &param)
-	if errs != nil {
-		app.ResponseError(c, http.StatusInternalServerError,
-			strings.Join(errs.Errors(), ","))
+	err := c.ShouldBind(&param)
+	if err != nil {
+		app.ResponseError(c, http.StatusBadRequest,
+			err.Error())
 		return
 	}
 
-	err := svc.EditUserInfo(&param)
+	err = svc.EditUserInfo(&param)
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError, err.Error())
 		return

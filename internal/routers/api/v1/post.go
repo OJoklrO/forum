@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 type PostHandler struct{}
@@ -142,10 +141,11 @@ type PostCreateResponse struct {
 // @Router /api/v1/posts [post]
 func (p PostHandler) Create(c *gin.Context) {
 	param := service.CreatePostRequest{}
-	errs := app.BindBodyWithValidation(c, &param)
-	if errs != nil {
-		app.ResponseError(c, http.StatusInternalServerError,
-			"app.BindBodyWithValidation errs: "+strings.Join(errs.Errors(), ","))
+
+	err := c.ShouldBind(&param)
+	if err != nil {
+		app.ResponseError(c, http.StatusBadRequest,
+			err.Error())
 		return
 	}
 
