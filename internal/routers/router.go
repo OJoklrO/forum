@@ -17,7 +17,6 @@ func NewRouter() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
-	//r.Use(middleware.Translations())
 
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
