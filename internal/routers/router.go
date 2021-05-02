@@ -27,8 +27,6 @@ func NewRouter() *gin.Engine {
 	config.AllowCredentials = true
 	r.Use(cors.New(config))
 
-	// todo: hot news
-
 	// todo: serve static page on "/"
 	//r.Use(static.Serve("/", static.LocalFile(global.AppSetting.StaticPagePath+"/", false)))
 	r.StaticFS("/upload", http.Dir(global.AppSetting.UploadSavePath))
@@ -63,6 +61,8 @@ func NewRouter() *gin.Engine {
 
 		apiV1.GET("/checkin", middleware.JWT(), v1.CheckIn)
 		apiV1.GET("/checkin/records", middleware.JWT(), v1.GetCheckInRecords)
+
+		apiV1.GET("/top", v1.GetTop)
 	}
 
 	return r

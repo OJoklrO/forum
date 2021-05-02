@@ -27,12 +27,3 @@ func GetMessageList(c *gin.Context) {
 func ReadMessage(c *gin.Context) {
 
 }
-
-// @Summary (Todo) Top posts, hot points.
-// @Produce json
-// @Param token header string true "jwt token"
-// @Success 200 {object} string "todo"
-// @Router /api/v1/check/tops [get]
-func MoveMeToOtherPlace(c *gin.Context) {
-
-}
