@@ -69,6 +69,7 @@ type PostListResponse struct {
 // @Produce json
 // @Param page query int true "Page number" default(1)
 // @Param page_size query int true "Page size" default(20)
+// @Param filter query string true "Filter"
 // @Param image_mode query bool false "Enable image mode" default(false)
 // @Success 200 {object} PostListResponse "success"
 // @Router /api/v1/posts [get]
@@ -83,6 +84,7 @@ func (p PostHandler) List(c *gin.Context) {
 
 	page, errPage := strconv.Atoi(c.Query("page"))
 	pageSize, errPageSize := strconv.Atoi(c.Query("page_size"))
+	pageFilter := c.Query("filter")
 	// todo: search filter
 	// todo: pin post
 	// todo: sort posts
@@ -94,14 +96,14 @@ func (p PostHandler) List(c *gin.Context) {
 		return
 	}
 
-	posts, err := svc.GetPostList(page, pageSize)
+	posts, err := svc.GetPostList(page, pageSize, pageFilter)
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.GetPostList err: "+err.Error())
 		return
 	}
 
-	var respPosts []Post
+	var respPosts []Post = make([]Post, 0)
 	for _, v := range posts {
 		voteUp, voteDown, err := svc.GetVotes(1, v.ID)
 		if err != nil {

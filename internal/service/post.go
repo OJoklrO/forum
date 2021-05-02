@@ -20,13 +20,13 @@ func (svc *Service) GetPost(param *GetPostRequest) (*model.Post, error) {
 	return p.Get(svc.db)
 }
 
-func (svc *Service) GetPostList(page, pageSize int) ([]*model.Post, error) {
+func (svc *Service) GetPostList(page, pageSize int, filter string) ([]*model.Post, error) {
 	p := model.Post{}
 	pageOffset := 0
 	if page > 0 {
 		pageOffset = (page - 1) * pageSize
 	}
-	return p.List(svc.db, pageOffset, pageSize)
+	return p.List(svc.db, pageOffset, pageSize, filter)
 }
 
 type CreatePostRequest struct {
@@ -69,5 +69,11 @@ func (svc *Service) DeletePost(param *DeletePostRequest) error {
 		ID:    param.ID,
 		IsDel: 1,
 	}
-	return p.Update(svc.db)
+	err = p.Update(svc.db)
+	if err != nil {
+		return err
+	}
+
+	comment := &model.Comment{PostID: p.ID, IsDel: true}
+	return comment.UpdateAllByPost(svc.db)
 }

@@ -221,6 +221,7 @@ func (comment *CommentHandler) Get(c *gin.Context) {
 // @Success 200 {object} MessageResponse "success"
 // @Router /api/v1/comments/{post_id}/{id}/vote/{support} [get]
 func (comment *CommentHandler) Vote(c *gin.Context) {
+	// todo: cancel vote
 	id, errId := strconv.Atoi(c.Param("id"))
 	postId, errPost := strconv.Atoi(c.Param("post_id"))
 	supportValue, errVote := strconv.Atoi(c.Param("support"))

@@ -5,15 +5,12 @@ serve:
 
 build:
 	swag init
-	rm ./build -rf
-	mkdir build
+	mkdir build -p
 	go build .
-	cp -r ./config ./storage build
+	rm ./build/forum
 	mv ./forum build
 
 test:build
-	rm ./build/config/config.yaml
-	mv ./build/config/8082.txt ./build/config/config.yaml
 	cd ./build; ./forum
 
 

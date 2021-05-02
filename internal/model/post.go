@@ -42,13 +42,14 @@ func (p Post) Get(db *gorm.DB) (*Post, error) {
 	return &post, err
 }
 
-func (p Post) List(db *gorm.DB, pageOffset, pageSize int) ([]*Post, error) {
+func (p Post) List(db *gorm.DB, pageOffset, pageSize int, filter string) ([]*Post, error) {
 	var posts []*Post
 	var err error
 	if pageOffset >= 0 && pageSize > 0 {
 		db = db.Offset(pageOffset).Limit(pageSize)
 	}
-	if err = db.Model(Post{}).Where("is_del = ?", 0).Find(&posts).Error; err != nil {
+	if err = db.Model(Post{}).Where("is_del = ?", 0).
+		Order("latest_reply desc").Find(&posts).Error; err != nil {
 		return nil, err
 	}
 	return posts, nil

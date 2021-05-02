@@ -7,7 +7,8 @@ import (
 
 func CleanHTMLTags(content string) (imageURLs []string, result string) {
 	var matches [][]string
-	imageRex := regexp.MustCompile("<img.*?src=\"(.*?)\"(.*?)alt=\"(.*?)\"> ")
+	//imageRex := regexp.MustCompile("<img.*?src=\"(.*?)\"(.*?)alt=\"(.*?)\"> ")
+	imageRex := regexp.MustCompile("<img.*?src=\"(.*?)\"(.*?)>")
 	matches = imageRex.FindAllStringSubmatch(content, -1)
 	cleanedContent := imageRex.ReplaceAllString(content, "")
 
