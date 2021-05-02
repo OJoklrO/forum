@@ -70,6 +70,32 @@ func Register(c *gin.Context) {
 	c.JSON(http.StatusOK, LoginResponse{token})
 }
 
+// @Summary Reset password.
+// @Produce json
+// @Param token header string true "jwt token"
+// @Param body body service.ResetPasswordRequest true "body"
+// @Success 200 {object} MessageResponse "success"
+// @Router /api/v1/accounts/reset-password [post]
+func ResetPassword(c *gin.Context) {
+	param := service.ResetPasswordRequest{}
+	errs := app.BindBodyWithValidation(c, &param)
+	if errs != nil {
+		app.ResponseError(c, http.StatusBadRequest,
+			"app.BindBodyWithValidation errs: "+strings.Join(errs.Errors(), ","))
+		return
+	}
+
+	svc := service.New(c)
+	err := svc.ResetPassword(&param)
+	if err != nil {
+		app.ResponseError(c, http.StatusInternalServerError,
+			"svc.ResetPassword err: "+err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, MessageResponse{"success."})
+}
+
 // @Summary Delete an account.
 // @Produce json
 // @Param id path string true "id"

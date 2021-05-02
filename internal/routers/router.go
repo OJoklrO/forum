@@ -41,6 +41,7 @@ func NewRouter() *gin.Engine {
 
 		apiV1.POST("/accounts/login", v1.Login)
 		apiV1.POST("/accounts/register", v1.Register)
+		apiV1.POST("/accounts/reset-password", middleware.JWT(), v1.ResetPassword)
 		apiV1.DELETE("/accounts/:id", middleware.JWT(), v1.DeleteAccount)
 		apiV1.GET("/accounts/:id", v1.GetAccountInfo)
 		apiV1.PUT("/accounts", middleware.JWT(), v1.EditAccountInfo)

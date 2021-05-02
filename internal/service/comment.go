@@ -167,12 +167,12 @@ func (svc *Service) Vote(id, postId uint32, support int) error {
 	return v.SetOrCreate(svc.db)
 }
 
-func (svc *Service) GetVotes(id, postId uint32) (int, error) {
+func (svc *Service) GetVotes(id, postId uint32) (int, int, error) {
 	v := &model.Vote{
 		PostID:    postId,
 		CommentID: id,
 	}
-	return v.CommentSum(svc.db)
+	return v.CommentVoteCount(svc.db)
 }
 
 func getBrief(content string) (imageURLs []string, result string) {

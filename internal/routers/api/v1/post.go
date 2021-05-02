@@ -18,7 +18,8 @@ func NewPost() PostHandler {
 
 type Post struct {
 	model.Post
-	Vote int `json:"vote"`
+	VoteUp   int `json:"vote_up"`
+	VoteDown int `json:"vote_down"`
 }
 
 // @Summary Get a post by id
@@ -44,7 +45,7 @@ func (p PostHandler) Get(c *gin.Context) {
 		return
 	}
 
-	vote, err := svc.GetVotes(1, post.ID)
+	voteUp, voteDown, err := svc.GetVotes(1, post.ID)
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.GetVotes error "+err.Error())
@@ -52,8 +53,9 @@ func (p PostHandler) Get(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, Post{
-		Vote: vote,
-		Post: *post,
+		VoteUp:   voteUp,
+		VoteDown: voteDown,
+		Post:     *post,
 	})
 }
 
@@ -68,6 +70,7 @@ type PostListResponse struct {
 // @Produce json
 // @Param page query int true "Page number" default(1)
 // @Param page_size query int true "Page size" default(20)
+// @Param image_mode query bool false "Enable image mode" default(false)
 // @Success 200 {object} PostListResponse "success"
 // @Router /api/v1/posts [get]
 func (p PostHandler) List(c *gin.Context) {
@@ -81,6 +84,11 @@ func (p PostHandler) List(c *gin.Context) {
 
 	page, errPage := strconv.Atoi(c.Query("page"))
 	pageSize, errPageSize := strconv.Atoi(c.Query("page_size"))
+	// todo: search filter
+	// todo: pin post
+	// todo: sort posts
+	// todo: posts image mode
+	//imageMode := c.Query("image_mode") == "true"
 	if errPage != nil || errPageSize != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"page or page_size param error.")
@@ -96,15 +104,16 @@ func (p PostHandler) List(c *gin.Context) {
 
 	var respPosts []Post
 	for _, v := range posts {
-		vote, err := svc.GetVotes(1, v.ID)
+		voteUp, voteDown, err := svc.GetVotes(1, v.ID)
 		if err != nil {
 			app.ResponseError(c, http.StatusInternalServerError,
 				"svc.GetVotes error "+err.Error())
 			return
 		}
 		respPosts = append(respPosts, Post{
-			Post: *v,
-			Vote: vote,
+			Post:     *v,
+			VoteUp:   voteUp,
+			VoteDown: voteDown,
 		})
 	}
 

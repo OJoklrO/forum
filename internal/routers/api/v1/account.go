@@ -48,3 +48,5 @@ func EditAccountInfo(c *gin.Context) {
 
 	c.JSON(http.StatusOK, MessageResponse{"success."})
 }
+
+// todo: get user's comments and posts

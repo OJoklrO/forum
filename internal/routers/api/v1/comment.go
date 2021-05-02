@@ -18,7 +18,8 @@ func NewComment() CommentHandler {
 
 type Comment struct {
 	model.Comment
-	Vote int `json:"vote"`
+	VoteUp   int `json:"vote_up"`
+	VoteDown int `json:"vote_down"`
 }
 
 type CommentListResponse struct {
@@ -75,15 +76,16 @@ func (comment *CommentHandler) List(c *gin.Context) {
 
 	var respComments []Comment
 	for _, v := range comments {
-		vote, err := svc.GetVotes(v.ID, v.PostID)
+		voteUp, voteDown, err := svc.GetVotes(v.ID, v.PostID)
 		if err != nil {
 			app.ResponseError(c, http.StatusInternalServerError,
 				"svc.GetVotes err: "+err.Error())
 			return
 		}
 		newItem := Comment{
-			Vote:    vote,
-			Comment: *v,
+			VoteUp:   voteUp,
+			VoteDown: voteDown,
+			Comment:  *v,
 		}
 		respComments = append(respComments, newItem)
 	}
@@ -191,7 +193,7 @@ func (comment *CommentHandler) Get(c *gin.Context) {
 		return
 	}
 
-	vote, err := svc.GetVotes(uint32(id), uint32(postId))
+	voteUp, voteDown, err := svc.GetVotes(uint32(id), uint32(postId))
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.GetVotes err: "+err.Error())
@@ -199,8 +201,9 @@ func (comment *CommentHandler) Get(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, Comment{
-		Comment: *targetComment,
-		Vote:    vote,
+		Comment:  *targetComment,
+		VoteUp:   voteUp,
+		VoteDown: voteDown,
 	})
 }
 

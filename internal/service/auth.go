@@ -98,3 +98,21 @@ func (svc *Service) CheckCommonPermission(ownerId string) error {
 	}
 	return nil
 }
+
+type ResetPasswordRequest struct {
+	OldPassword string `form:"old_password" binding:"required"`
+	NewPassword string `form:"new_password" binding:"required"`
+}
+
+func (svc *Service) ResetPassword(param *ResetPasswordRequest) (err error) {
+	param.OldPassword = fmt.Sprintf("%x", md5.Sum([]byte(param.OldPassword)))
+	param.NewPassword = fmt.Sprintf("%x", md5.Sum([]byte(param.NewPassword)))
+	account := model.Account{ID: svc.ctx.Value("user_id").(string), Password: param.OldPassword}
+	err = account.CheckPassword(svc.db)
+	if err != nil {
+		return err
+	}
+
+	account.Password = param.NewPassword
+	return account.Update(svc.db)
+}
