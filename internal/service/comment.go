@@ -2,6 +2,7 @@ package service
 
 import (
 	"forum/internal/model"
+	"log"
 	"regexp"
 	"time"
 
@@ -41,13 +42,13 @@ type CreateCommentRequest struct {
 }
 
 func (svc *Service) CreateComment(param *CreateCommentRequest) error {
-	c := model.Comment{
+	comment := model.Comment{
 		UserID:  svc.ctx.Value("user_id").(string),
 		PostID:  param.PostID,
 		Content: param.Content,
 		Time:    time.Now().Format("2006-01-02"),
 	}
-	err := c.Create(svc.db)
+	err := comment.Create(svc.db)
 	if err != nil {
 		return err
 	}
@@ -64,11 +65,30 @@ func (svc *Service) CreateComment(param *CreateCommentRequest) error {
 
 	post := model.Post{
 		ID:           param.PostID,
-		LatestReply:  c.Time,
+		LatestReply:  comment.Time,
 		ReplyUserID:  svc.ctx.Value("user_id").(string),
 		CommentCount: uint32(count),
 	}
-	return post.Update(svc.db)
+	err = post.Update(svc.db)
+	if err != nil {
+		return err
+	}
+
+	// find @username
+	var matches [][]string
+	atRex := regexp.MustCompile(" @(.*?) ")
+	matches = atRex.FindAllStringSubmatch(param.Content, -1)
+	var names []string
+	for _, val := range matches {
+		names = append(names, val[1])
+		from := val[1]
+		to := svc.ctx.Value("user_name").(string)
+		err = svc.CreateNotifyMessage(from, to, post.ID, comment.ID)
+		if err != nil {
+			log.Println("error svc.CreateNotifyMessage: " + err.Error())
+		}
+	}
+	return nil
 }
 
 type EditCommentRequest struct {
@@ -78,23 +98,42 @@ type EditCommentRequest struct {
 }
 
 func (svc *Service) EditComment(param *EditCommentRequest) error {
-	c := model.Comment{
+	comment := model.Comment{
 		PostID:   param.PostID,
 		ID:       param.ID,
 		Content:  param.Content,
 		Time:     time.Now().Format("2006-01-02"),
 		IsEdited: true,
 	}
-	err := c.Update(svc.db)
+	err := comment.Update(svc.db)
 	if err != nil {
 		return err
 	}
 	post := model.Post{
 		ID:          param.PostID,
-		LatestReply: c.Time,
+		LatestReply: comment.Time,
 		ReplyUserID: svc.ctx.Value("user_id").(string),
 	}
-	return post.Update(svc.db)
+	err = post.Update(svc.db)
+	if err != nil {
+		return err
+	}
+
+	// find @username
+	var matches [][]string
+	atRex := regexp.MustCompile(" @(.*?) ")
+	matches = atRex.FindAllStringSubmatch(param.Content, -1)
+	var names []string
+	for _, val := range matches {
+		names = append(names, val[1])
+		from := val[1]
+		to := svc.ctx.Value("user_name").(string)
+		err = svc.CreateNotifyMessage(from, to, post.ID, comment.ID)
+		if err != nil {
+			log.Println("error svc.CreateNotifyMessage: " + err.Error())
+		}
+	}
+	return nil
 }
 
 func (svc *Service) DeleteComment(id, postId uint32) error {

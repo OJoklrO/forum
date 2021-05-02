@@ -63,6 +63,9 @@ func NewRouter() *gin.Engine {
 		apiV1.GET("/checkin/records", middleware.JWT(), v1.GetCheckInRecords)
 
 		apiV1.GET("/top", v1.GetTop)
+
+		apiV1.GET("/messages", middleware.JWT(), v1.GetMessageList)
+		apiV1.GET("/messages/:post_id/:comment_id", middleware.JWT(), v1.ReadMessage)
 	}
 
 	return r
