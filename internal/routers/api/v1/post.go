@@ -58,8 +58,10 @@ func (p PostHandler) Get(c *gin.Context) {
 }
 
 type PostListResponse struct {
-	Posts      []Post `json:"posts"`
-	TotalPosts int    `json:"total_posts"`
+	Posts      []Post     `json:"posts"`
+	PostBriefs []string   `json:"post_briefs"`
+	PostImages [][]string `json:"post_images"`
+	TotalPosts int        `json:"total_posts"`
 }
 
 // @Summary Get a post list with pagination settings.
@@ -106,10 +108,17 @@ func (p PostHandler) List(c *gin.Context) {
 		})
 	}
 
-	c.JSON(http.StatusOK, PostListResponse{
-		respPosts,
-		count,
-	})
+	response := &PostListResponse{Posts: respPosts, TotalPosts: count}
+	response.PostBriefs = make([]string, len(respPosts))
+	response.PostImages = make([][]string, len(respPosts))
+	for i := range respPosts {
+		response.PostImages[i], response.PostBriefs[i], err = svc.GetCommentBrief(1, respPosts[i].ID)
+		if err != nil {
+			app.ResponseError(c, http.StatusInternalServerError,
+				"svc.GetCommentBrief: "+err.Error())
+		}
+	}
+	c.JSON(http.StatusOK, response)
 }
 
 type PostCreateResponse struct {
@@ -174,13 +183,4 @@ type PostImageListResponse struct {
 	Posts      []*model.Post `json:"posts"`
 	Images     []string      `json:"images"`
 	TotalPages int           `json:"total_pages"`
-}
-
-// @Summary (Todo)Get a post image list with pagination settings.
-// @Produce json
-// @Param page query int true "Page number" default(1)
-// @Param page_size query int true "Page size" default(20)
-// @Success 200 {object} PostImageListResponse "success"
-// @Router /api/v1/posts_images [get]
-func (p PostHandler) Images(c *gin.Context) {
 }

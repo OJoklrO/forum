@@ -2,7 +2,10 @@ package service
 
 import (
 	"forum/internal/model"
+	"regexp"
 	"time"
+
+	"github.com/grokify/html-strip-tags-go"
 )
 
 func (svc *Service) CountCommentsOfPost(postId uint32) (int, error) {
@@ -131,4 +134,27 @@ func (svc *Service) GetVotes(id, postId uint32) (int, error) {
 		CommentID: id,
 	}
 	return v.CommentSum(svc.db)
+}
+
+func getBrief(content string) (imageURLs []string, result string) {
+	var matches [][]string
+	imageRex := regexp.MustCompile("<img.*?src=\"(.*?)\"(.*?)alt=\"(.*?)\"> ")
+	matches = imageRex.FindAllStringSubmatch(content, -1)
+	cleanedContent := imageRex.ReplaceAllString(content, "")
+
+	for _, val := range matches {
+		imageURLs = append(imageURLs, val[1])
+	}
+
+	result = strip.StripTags(cleanedContent)
+	return
+}
+
+func (svc *Service) GetCommentBrief(id, postId uint32) (imageURLs []string, briefContent string, err error) {
+	comment, err := svc.GetComment(id, postId)
+	if err != nil {
+		return
+	}
+	imageURLs, briefContent = getBrief(comment.Content)
+	return
 }

@@ -22,7 +22,6 @@ func GetAccountInfo(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, account)
-	// todo: user level
 }
 
 // @Summary Edit account information.
