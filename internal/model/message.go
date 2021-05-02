@@ -24,10 +24,18 @@ func (m *Message) Update(db *gorm.DB) error {
 	return db.Model(m).Where(target).Update("read", m.Read).Error
 }
 
-func (m *Message) GetUnreadList(db *gorm.DB) (results []*Message, err error) {
-	err = db.Where(map[string]interface{}{
-		"to":   m.To,
-		"read": false,
+func (m *Message) GetList(db *gorm.DB) (results []*Message, err error) {
+	err = db.Model(m).Where(map[string]interface{}{
+		"to": m.To,
 	}).Find(&results).Error
 	return
+}
+
+func (m *Message) CountUnread(db *gorm.DB) (int, error) {
+	res := 0
+	err := db.Model(m).Where(map[string]interface{}{
+		"to":   m.To,
+		"read": false,
+	}).Count(&res).Error
+	return res, err
 }

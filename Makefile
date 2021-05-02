@@ -4,6 +4,7 @@ serve:
 	go run main.go
 
 build:
+	swag init
 	rm ./build -rf
 	mkdir build
 	go build .

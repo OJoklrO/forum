@@ -8,20 +8,36 @@ import (
 	"strconv"
 )
 
-// @Summary Get unread messages(reply notifications).
+// @Summary Get messages(reply notifications).
 // @Produce json
 // @Param token header string true "jwt token"
 // @Success 200 {object} []model.Message "messages"
 // @Router /api/v1/messages [get]
 func GetMessageList(c *gin.Context) {
 	svc := service.New(c)
-	results, err := svc.GetUnreadMessages()
+	results, err := svc.GetMessages()
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.GetUnreadMessages: "+err.Error())
 		return
 	}
 	c.JSON(http.StatusOK, results)
+}
+
+// @Summary Get the number of unread messages(reply notifications).
+// @Produce json
+// @Param token header string true "jwt token"
+// @Success 200 {object} int "unread message count"
+// @Router /api/v1/messages/unread [get]
+func GetUnreadMessageCount(c *gin.Context) {
+	svc := service.New(c)
+	result, err := svc.UnreadMessages()
+	if err != nil {
+		app.ResponseError(c, http.StatusInternalServerError,
+			"svc.GetUnreadMessages: "+err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"count": result})
 }
 
 // @Summary Make an unread message read.
