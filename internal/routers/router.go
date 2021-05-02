@@ -6,6 +6,7 @@ import (
 	"forum/internal/middleware"
 	v1 "forum/internal/routers/api/v1"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -27,8 +28,7 @@ func NewRouter() *gin.Engine {
 	config.AllowCredentials = true
 	r.Use(cors.New(config))
 
-	// todo: serve static page on "/"
-	//r.Use(static.Serve("/", static.LocalFile(global.AppSetting.StaticPagePath+"/", false)))
+	r.Use(static.Serve("/", static.LocalFile(global.AppSetting.StaticPagePath+"/", false)))
 	r.StaticFS("/upload", http.Dir(global.AppSetting.UploadSavePath))
 
 	// swagger ui
@@ -45,6 +45,8 @@ func NewRouter() *gin.Engine {
 		apiV1.DELETE("/accounts/:id", middleware.JWT(), v1.DeleteAccount)
 		apiV1.GET("/accounts/:id", v1.GetAccountInfo)
 		apiV1.PUT("/accounts", middleware.JWT(), v1.EditAccountInfo)
+
+		apiV1.GET("/me/account", middleware.JWT(), v1.GetMyAccountInfo)
 
 		post := v1.NewPost()
 		apiV1.GET("/posts", post.List)

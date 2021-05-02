@@ -24,6 +24,22 @@ func GetAccountInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, account)
 }
 
+// @Summary Get account information of myself.
+// @Produce json
+// @Param token header string true "token"
+// @Success 200 {object} service.AccountInfo "success"
+// @Router /api/v1/me/account [get]
+func GetMyAccountInfo(c *gin.Context) {
+	svc := service.New(c)
+	account, err := svc.GetUserInfo(c.Value("user_id").(string))
+	if err != nil {
+		app.ResponseError(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, account)
+}
+
 // @Summary Edit account information.
 // @Produce json
 // @Param body body service.EditAccountInfoRequest true "New account information."
