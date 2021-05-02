@@ -2,11 +2,10 @@ package service
 
 import (
 	"forum/internal/model"
+	"forum/pkg/app"
 	"log"
 	"regexp"
 	"time"
-
-	"github.com/grokify/html-strip-tags-go"
 )
 
 func (svc *Service) CountCommentsOfPost(postId uint32) (int, error) {
@@ -41,7 +40,7 @@ type CreateCommentRequest struct {
 	Content string `form:"content" binding:"required" json:"content"`
 }
 
-func (svc *Service) CreateComment(param *CreateCommentRequest) error {
+func (svc *Service) CreateComment(param *CreateCommentRequest) (*model.Comment, error) {
 	comment := model.Comment{
 		UserID:  svc.ctx.Value("user_id").(string),
 		PostID:  param.PostID,
@@ -50,17 +49,17 @@ func (svc *Service) CreateComment(param *CreateCommentRequest) error {
 	}
 	err := comment.Create(svc.db)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	count, err := svc.CountCommentsOfPost(param.PostID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	err = svc.UpdateUserLevel()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	post := model.Post{
@@ -71,24 +70,18 @@ func (svc *Service) CreateComment(param *CreateCommentRequest) error {
 	}
 	err = post.Update(svc.db)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	// find @username
-	var matches [][]string
-	atRex := regexp.MustCompile(" @(.*?) ")
-	matches = atRex.FindAllStringSubmatch(param.Content, -1)
-	var names []string
-	for _, val := range matches {
-		names = append(names, val[1])
-		from := val[1]
-		to := svc.ctx.Value("user_name").(string)
-		err = svc.CreateNotifyMessage(from, to, post.ID, comment.ID)
+	names := getNamesFromContent(param.Content)
+	for _, name := range names {
+		to := name
+		err = svc.CreateNotifyMessage(to, post.ID, comment.ID)
 		if err != nil {
 			log.Println("error svc.CreateNotifyMessage: " + err.Error())
 		}
 	}
-	return nil
+	return &comment, nil
 }
 
 type EditCommentRequest struct {
@@ -119,21 +112,53 @@ func (svc *Service) EditComment(param *EditCommentRequest) error {
 		return err
 	}
 
-	// find @username
-	var matches [][]string
-	atRex := regexp.MustCompile(" @(.*?) ")
-	matches = atRex.FindAllStringSubmatch(param.Content, -1)
-	var names []string
-	for _, val := range matches {
-		names = append(names, val[1])
-		from := val[1]
-		to := svc.ctx.Value("user_name").(string)
-		err = svc.CreateNotifyMessage(from, to, post.ID, comment.ID)
+	names := getNamesFromContent(param.Content)
+	for _, name := range names {
+		to := name
+		err = svc.CreateNotifyMessage(to, post.ID, comment.ID)
 		if err != nil {
 			log.Println("error svc.CreateNotifyMessage: " + err.Error())
 		}
 	}
 	return nil
+}
+
+func getNamesFromContent(content string) []string {
+	if len(content) == 0 {
+		return nil
+	}
+
+	_, content = app.CleanHTMLTags(content)
+	content += " " // add this for @userID in the last
+
+	var names []string
+
+	// find first @userid at the beginning
+	if content[0] == '@' {
+		index := 0
+		for ; index < len(content); index++ {
+			if content[index] == ' ' {
+				names = append(names, content[1:index])
+				content = content[index+1:]
+				break
+			}
+		}
+		// if this can not found,
+		// there is nothing after @username
+		if len(names) == 0 {
+			names = append(names, content[1:])
+			return names
+		}
+	}
+
+	var matches [][]string
+	atRex := regexp.MustCompile(" @(.*?) ")
+	matches = atRex.FindAllStringSubmatch(content, -1)
+
+	for _, val := range matches {
+		names = append(names, val[1])
+	}
+	return names
 }
 
 func (svc *Service) DeleteComment(id, postId uint32) error {
@@ -175,25 +200,11 @@ func (svc *Service) GetVotes(id, postId uint32) (int, int, error) {
 	return v.CommentVoteCount(svc.db)
 }
 
-func getBrief(content string) (imageURLs []string, result string) {
-	var matches [][]string
-	imageRex := regexp.MustCompile("<img.*?src=\"(.*?)\"(.*?)alt=\"(.*?)\"> ")
-	matches = imageRex.FindAllStringSubmatch(content, -1)
-	cleanedContent := imageRex.ReplaceAllString(content, "")
-
-	for _, val := range matches {
-		imageURLs = append(imageURLs, val[1])
-	}
-
-	result = strip.StripTags(cleanedContent)
-	return
-}
-
 func (svc *Service) GetCommentBrief(id, postId uint32) (imageURLs []string, briefContent string, err error) {
 	comment, err := svc.GetComment(id, postId)
 	if err != nil {
 		return
 	}
-	imageURLs, briefContent = getBrief(comment.Content)
+	imageURLs, briefContent = app.CleanHTMLTags(comment.Content)
 	return
 }

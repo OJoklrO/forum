@@ -31,7 +31,12 @@ func GetAccountInfo(c *gin.Context) {
 // @Router /api/v1/me/account [get]
 func GetMyAccountInfo(c *gin.Context) {
 	svc := service.New(c)
-	account, err := svc.GetUserInfo(c.Value("user_id").(string))
+	id, exists := c.Get("user_id")
+	if !exists {
+		app.ResponseError(c, http.StatusInternalServerError, "user_id not exists")
+		return
+	}
+	account, err := svc.GetUserInfo(id.(string))
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError, err.Error())
 		return

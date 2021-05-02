@@ -96,11 +96,15 @@ func (comment *CommentHandler) List(c *gin.Context) {
 	})
 }
 
+type CreateCommentResponse struct {
+	CommentID uint32 `json:"comment_id"`
+}
+
 // @Summary Comment a post.
 // @Produce json
 // @Param body body service.CreateCommentRequest true "body"
 // @Param token header string true "jwt token"
-// @Success 200 {object} MessageResponse "success"
+// @Success 200 {object} CreateCommentResponse "success"
 // @Router /api/v1/comments [post]
 func (comment *CommentHandler) Create(c *gin.Context) {
 	param := service.CreateCommentRequest{}
@@ -112,14 +116,14 @@ func (comment *CommentHandler) Create(c *gin.Context) {
 	}
 
 	svc := service.New(c)
-	err := svc.CreateComment(&param)
+	commentModel, err := svc.CreateComment(&param)
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.CreateComment err: "+err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, MessageResponse{"success."})
+	c.JSON(http.StatusOK, CreateCommentResponse{commentModel.ID})
 }
 
 // @Summary Delete a comment.

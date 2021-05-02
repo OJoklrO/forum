@@ -3,8 +3,6 @@ package app
 import (
 	"forum/global"
 	"github.com/gin-gonic/gin"
-	ut "github.com/go-playground/universal-translator"
-	"github.com/go-playground/validator/v10"
 	"strings"
 )
 
@@ -41,19 +39,22 @@ func (v ValidErrors) Errors() []string {
 
 // BindBodyWithValidation binds values from POST request body.
 func BindBodyWithValidation(c *gin.Context, v interface{}) ValidErrors {
-	var errs ValidErrors
-	err := c.ShouldBind(v)
-	if err != nil {
-		v := c.Value("trans")
-		trans, _ := v.(ut.Translator)
-		vErrs, _ := err.(validator.ValidationErrors)
-		for key, value := range vErrs.Translate(trans) {
-			errs = append(errs, &ValidError{
-				Key:     key,
-				Message: value,
-			})
-		}
-		return errs
-	}
+	// todo: validator, middleware of translation
+	_ = c.ShouldBind(v)
 	return nil
+	//var errs ValidErrors
+	//err := c.ShouldBind(v)
+	//if err != nil {
+	//	v := c.Value("trans")
+	//	trans, _ := v.(ut.Translator)
+	//	vErrs, _ := err.(validator.ValidationErrors)
+	//	for key, value := range vErrs.Translate(trans) {
+	//		errs = append(errs, &ValidError{
+	//			Key:     key,
+	//			Message: value,
+	//		})
+	//	}
+	//	return errs
+	//}
+	//return nil
 }

@@ -44,7 +44,7 @@ func (svc *Service) CreatePost(param *CreatePostRequest) (post *model.Post, err 
 	if err != nil {
 		return
 	}
-	err = svc.CreateComment(&CreateCommentRequest{
+	_, err = svc.CreateComment(&CreateCommentRequest{
 		PostID:  post.ID,
 		Content: param.Content,
 	})

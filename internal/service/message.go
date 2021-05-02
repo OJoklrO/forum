@@ -2,7 +2,8 @@ package service
 
 import "forum/internal/model"
 
-func (svc *Service) CreateNotifyMessage(from, to string, postId, commentId uint32) error {
+func (svc *Service) CreateNotifyMessage(to string, postId, commentId uint32) error {
+	from := svc.ctx.Value("user_id").(string)
 	message := &model.Message{
 		From:      from,
 		To:        to,
