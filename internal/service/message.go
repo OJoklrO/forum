@@ -4,6 +4,9 @@ import "forum/internal/model"
 
 func (svc *Service) CreateNotifyMessage(to string, postId, commentId uint32) error {
 	from := svc.ctx.Value("user_id").(string)
+	if from == to {
+		return nil
+	}
 	message := &model.Message{
 		From:      from,
 		To:        to,

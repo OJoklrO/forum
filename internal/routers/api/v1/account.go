@@ -13,6 +13,7 @@ import (
 // @Success 200 {object} service.AccountInfo "success"
 // @Router /api/v1/accounts/{id} [get]
 func GetAccountInfo(c *gin.Context) {
+	// todo: account info, is admin
 	svc := service.New(c)
 	account, err := svc.GetUserInfo(c.Params.ByName("id"))
 	if err != nil {

@@ -89,6 +89,7 @@ func (p PostHandler) List(c *gin.Context) {
 	// todo: pin post
 	// todo: sort posts
 	// todo: posts image mode
+	// todo: time format
 	//imageMode := c.Query("image_mode") == "true"
 	if errPage != nil || errPageSize != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
