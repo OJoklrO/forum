@@ -1,7 +1,6 @@
 package model
 
 import (
-	"errors"
 	"github.com/jinzhu/gorm"
 )
 
@@ -17,13 +16,8 @@ func (v *Vote) TableName() string {
 }
 
 func (v *Vote) SetOrCreate(db *gorm.DB) error {
-	result := db.Model(v).Where("user_id = ? AND post_id = ? AND comment_id = ?", v.UserID, v.PostID, v.CommentID).Update(map[string]interface{}{"vote": v.Vote})
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) ||
-		result.RowsAffected == 0 {
-		return db.Create(v).Error
-	} else {
-		return result.Error
-	}
+	voteValue := v.Vote
+	return db.Where("user_id = ? AND post_id = ? AND comment_id = ?", v.UserID, v.PostID, v.CommentID).Assign(Vote{Vote: voteValue}).FirstOrCreate(v).Error
 }
 
 func (v *Vote) Get(db *gorm.DB) error {

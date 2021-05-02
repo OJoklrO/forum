@@ -32,6 +32,7 @@ func (svc *Service) LoginAccount(param *LoginRequest) (token string, err error) 
 type RegisterRequest struct {
 	ID         string `form:"id" binding:"required"`
 	Password   string `form:"password" binding:"required"`
+	Name       string `form:"name" binding:"required"`
 	InviteCode string `form:"invite_code" binding:"required" json:"invite_code"`
 }
 
@@ -50,6 +51,7 @@ func (svc *Service) RegisterAccount(param *RegisterRequest) (token string, err e
 	auth := model.Account{
 		ID:       param.ID,
 		Password: param.Password,
+		Name:     param.Name,
 	}
 
 	err = auth.Create(svc.db)
@@ -76,6 +78,10 @@ func (svc *Service) DeleteAccount(param *DeleteAccountRequest) error {
 	}
 	auth := model.Account{
 		ID: param.ID,
+	}
+	exist, err := auth.Exist(svc.db)
+	if err != nil || !exist {
+		return errors.New("account not exist")
 	}
 	return auth.Delete(svc.db)
 }

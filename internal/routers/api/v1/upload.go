@@ -7,11 +7,15 @@ import (
 	"net/http"
 )
 
+type UploadImageResponse struct {
+	URL string `json:"url"`
+}
+
 // @Summary Upload.
 // @Produce json
 // @Param file formData file true "image file"
 // @Param token header string true "jwt token"
-// @Success 200 {string} string "success"
+// @Success 200 {object} UploadImageResponse "success"
 // @Router /api/v1/upload [post]
 func UploadImage(c *gin.Context) {
 	file, fileHeader, err := c.Request.FormFile("file")
@@ -25,11 +29,11 @@ func UploadImage(c *gin.Context) {
 	}
 
 	svc := service.New(c)
-	fileInfo, err := svc.Upload(file, fileHeader)
+	url, err := svc.Upload(file, fileHeader)
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError, err.Error())
 		return
 	}
 
-	c.JSON(http.StatusOK, fileInfo)
+	c.JSON(http.StatusOK, UploadImageResponse{url})
 }

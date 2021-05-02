@@ -1,7 +1,6 @@
 package model
 
 import (
-	"errors"
 	"github.com/jinzhu/gorm"
 )
 
@@ -11,9 +10,9 @@ type Account struct {
 	Password    string `json:"password"`
 	IsDel       bool   `json:"is_del"`
 	Description string `json:"description"`
-	Gender      uint32    `json:"gender"`
+	Gender      uint32 `json:"gender"`
 	Avatar      string `json:"avatar"`
-	Level       uint32    `json:"level"`
+	Level       uint32 `json:"level"`
 }
 
 func (a Account) TableName() string {
@@ -46,10 +45,6 @@ func (a *Account) Create(db *gorm.DB) error {
 }
 
 func (a *Account) Delete(db *gorm.DB) error {
-	exist, err := a.Exist(db)
-	if !exist || err != nil {
-		return errors.New("the account does not exists")
-	}
 	a.IsDel = true
 	return db.Model(&Account{}).Where("id = ?", a.ID).Update(&a).Error
 }
