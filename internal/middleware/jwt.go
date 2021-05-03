@@ -19,8 +19,8 @@ func JWT(strict bool) gin.HandlerFunc {
 		}
 
 		if token == "" {
-			app.ResponseError(c, http.StatusUnauthorized, "the token is empty")
 			if strict {
+				app.ResponseError(c, http.StatusUnauthorized, "the token is empty")
 				c.Abort()
 			}
 			return

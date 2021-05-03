@@ -1,6 +1,9 @@
 package model
 
-import "github.com/jinzhu/gorm"
+import (
+	"fmt"
+	"github.com/jinzhu/gorm"
+)
 
 type Message struct {
 	From      string `json:"from"`
@@ -25,10 +28,22 @@ func (m *Message) Update(db *gorm.DB) error {
 	return db.Model(m).Where(target).Update("read", m.Read).Error
 }
 
-func (m *Message) GetList(db *gorm.DB) (results []*Message, err error) {
-	err = db.Model(m).Where(map[string]interface{}{
-		"to": m.To,
-	}).Find(&results).Error
+func (m *Message) CountList(db *gorm.DB, filter string) (count int, err error) {
+	err = db.Model(m).Where("`to` = ? AND `from` LIKE ?", m.To, "%"+filter+"%").Count(&count).Error
+	if err != nil {
+		fmt.Println("no ", err.Error())
+	}
+	return
+}
+
+func (m *Message) GetList(db *gorm.DB, pageOffset, pageSize int, filter string) (results []*Message, err error) {
+	if pageOffset >= 0 && pageSize > 0 {
+		db = db.Offset(pageOffset).Limit(pageSize)
+	}
+
+	err = db.Model(m).Where("`to` = ? AND `from` LIKE '%"+filter+"%' ", m.To).
+		Order("`read`").
+		Find(&results).Error
 	return
 }
 

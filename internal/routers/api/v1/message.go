@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"forum/internal/model"
 	"forum/internal/service"
 	"forum/pkg/app"
 	"github.com/gin-gonic/gin"
@@ -8,20 +9,36 @@ import (
 	"strconv"
 )
 
+type MessageListResponse struct {
+	Messages []*model.Message `json:"messages"`
+	Count    int              `json:"count"`
+}
+
 // @Summary Get messages(reply notifications).
 // @Produce json
 // @Param token header string true "jwt token"
-// @Success 200 {object} []model.Message "messages"
+// @Param filter query string false "Filter"
+// @Param page query int true "Page number" default(1)
+// @Param page_size query int true "Page size" default(20)
+// @Success 200 {object} MessageListResponse "messages"
 // @Router /api/v1/messages [get]
 func GetMessageList(c *gin.Context) {
+	page, errPage := strconv.Atoi(c.Query("page"))
+	pageSize, errPageSize := strconv.Atoi(c.Query("page_size"))
+	pageFilter := c.Query("filter")
+	if errPage != nil || errPageSize != nil {
+		app.ResponseError(c, http.StatusInternalServerError,
+			"page or page_size param error.")
+		return
+	}
 	svc := service.New(c)
-	results, err := svc.GetMessages()
+	results, count, err := svc.GetMessages(page, pageSize, pageFilter)
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.GetUnreadMessages: "+err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, results)
+	c.JSON(http.StatusOK, MessageListResponse{Messages: results, Count: count})
 }
 
 type UnreadMessageCountResponse struct {
