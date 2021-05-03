@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/jinzhu/gorm"
+	"strconv"
 )
 
 type Comment struct {
@@ -19,6 +20,15 @@ func (c *Comment) TableName() string {
 }
 
 func (c *Comment) CountByUserId(db *gorm.DB) (int, error) {
+	var count int
+	err := db.Model(&Comment{}).Where("user_id = ? AND is_del = ?", c.UserID, 0).Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (c *Comment) CountByUser(db *gorm.DB) (int, error) {
 	var count int
 	err := db.Model(&Comment{}).Where("user_id = ? AND is_del = ?", c.UserID, 0).Count(&count).Error
 	if err != nil {
@@ -45,13 +55,21 @@ func (c *Comment) CountUsers(db *gorm.DB) (int, error) {
 	return count, nil
 }
 
-func (c *Comment) List(db *gorm.DB, pageOffset, pageSize int) ([]*Comment, error) {
+func (c *Comment) List(db *gorm.DB, pageOffset, pageSize int, filter string) ([]*Comment, error) {
 	var comments []*Comment
 	var err error
 	if pageOffset >= 0 && pageSize > 0 {
 		db = db.Offset(pageOffset).Limit(pageSize)
 	}
-	if err = db.Model(Comment{}).Where("post_id = ? AND is_del = ?", c.PostID, 0).Find(&comments).Error; err != nil {
+	query := " is_del = 0"
+	if c.PostID != 0 {
+		query += " AND post_id = " + strconv.Itoa(int(c.PostID)) + " "
+	}
+	if len(c.UserID) != 0 {
+		query += " AND user_id = '" + c.UserID + "' "
+	}
+	query += " AND content LIKE '%" + filter + "%' "
+	if err = db.Model(Comment{}).Where(query).Find(&comments).Error; err != nil {
 		return nil, err
 	}
 	return comments, nil

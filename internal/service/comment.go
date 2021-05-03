@@ -8,6 +8,13 @@ import (
 	"time"
 )
 
+func (svc *Service) CountAllCommentsOfUser(userId string) (int, error) {
+	c := model.Comment{
+		UserID: userId,
+	}
+	return c.CountByUser(svc.db)
+}
+
 func (svc *Service) CountCommentsOfPost(postId uint32) (int, error) {
 	c := model.Comment{
 		PostID: postId,
@@ -15,24 +22,20 @@ func (svc *Service) CountCommentsOfPost(postId uint32) (int, error) {
 	return c.CountByPostId(svc.db)
 }
 
-type ListCommentRequest struct {
-	PostID uint32 `form:"post_id" binding:"required,gte=1"`
-}
-
-func (svc *Service) CountCommentUsers(param *ListCommentRequest) (int, error) {
+func (svc *Service) CountCommentUsers(postId uint32) (int, error) {
 	c := model.Comment{
-		PostID: param.PostID,
+		PostID: postId,
 	}
 	return c.CountUsers(svc.db)
 }
 
-func (svc *Service) ListComment(param *ListCommentRequest, page, pageSize int) ([]*model.Comment, error) {
-	c := model.Comment{PostID: param.PostID}
+func (svc *Service) ListComment(postId uint32, page, pageSize int, filter string) ([]*model.Comment, error) {
+	c := model.Comment{PostID: postId}
 	pageOffset := 0
 	if page > 0 {
 		pageOffset = (page - 1) * pageSize
 	}
-	return c.List(svc.db, pageOffset, pageSize)
+	return c.List(svc.db, pageOffset, pageSize, filter)
 }
 
 type CreateCommentRequest struct {
@@ -179,6 +182,15 @@ func (svc *Service) GetComment(id, postId uint32) (*model.Comment, error) {
 		PostID: postId,
 	}
 	return c.Get(svc.db)
+}
+
+func (svc *Service) GetAllCommentsByUser(userId, filter string, page, pageSize int) ([]*model.Comment, error) {
+	c := model.Comment{UserID: userId}
+	pageOffset := 0
+	if page > 0 {
+		pageOffset = (page - 1) * pageSize
+	}
+	return c.List(svc.db, pageOffset, pageSize, filter)
 }
 
 func (svc *Service) Vote(id, postId uint32, support int) error {

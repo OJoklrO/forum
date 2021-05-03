@@ -45,9 +45,10 @@ func NewRouter() *gin.Engine {
 		apiV1.PUT("/accounts", middleware.JWT(true), v1.EditAccountInfo)
 
 		apiV1.GET("/me/account", middleware.JWT(true), v1.GetMyAccountInfo)
+		apiV1.GET("/me/comments", middleware.JWT(true), v1.GetMyComments)
 
 		post := v1.NewPost()
-		apiV1.GET("/posts", post.List)
+		apiV1.GET("/posts", middleware.JWT(false), post.List)
 		apiV1.GET("/posts/:id", post.Get)
 		apiV1.POST("/posts", middleware.JWT(true), post.Create)
 		apiV1.DELETE("/posts/:id", middleware.JWT(true), post.Delete)

@@ -36,26 +36,25 @@ type CommentListResponse struct {
 // @Param post_id path int true "post id"
 // @Param page query int true "page number" default(1)
 // @Param page_size query int true "page size" default(20)
+// @Param filter query string false "filter"
 // @Success 200 {object} CommentListResponse "success"
 // @Router /api/v1/comments/{post_id} [get]
 func (comment *CommentHandler) List(c *gin.Context) {
 	// todo: return like status depending on jwt (user)
-	param := service.ListCommentRequest{}
 	postID, err := strconv.Atoi(c.Param("post_id"))
 	if err != nil {
 		app.ResponseError(c, http.StatusBadRequest, "param error.")
 		return
 	}
-	param.PostID = uint32(postID)
 
 	svc := service.New(c)
-	commentCount, err := svc.CountCommentsOfPost(param.PostID)
+	commentCount, err := svc.CountCommentsOfPost(uint32(postID))
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.CountComments err: "+err.Error())
 		return
 	}
-	userCount, err := svc.CountCommentUsers(&service.ListCommentRequest{PostID: param.PostID})
+	userCount, err := svc.CountCommentUsers(uint32(postID))
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.CountCommentUsers err: "+err.Error())
@@ -64,13 +63,14 @@ func (comment *CommentHandler) List(c *gin.Context) {
 
 	page, errPage := strconv.Atoi(c.Query("page"))
 	pageSize, errPageSize := strconv.Atoi(c.Query("page_size"))
+	filter := c.Query("filter")
 	if errPage != nil || errPageSize != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"page or page_size param error.")
 		return
 	}
 
-	comments, err := svc.ListComment(&param, page, pageSize)
+	comments, err := svc.ListComment(uint32(postID), page, pageSize, filter)
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.ListComment err: "+err.Error())

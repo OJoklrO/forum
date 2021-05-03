@@ -82,6 +82,8 @@ type PostListResponse struct {
 // @Param page query int true "Page number" default(1)
 // @Param page_size query int true "Page size" default(20)
 // @Param user_id query string false "User id"
+// @Param only_me query bool false "User id"
+// @Param token header string false "jwt token(if checked only_me)"
 // @Param filter query string false "Filter"
 // @Param image_mode query bool false "Enable image mode" default(false)
 // @Success 200 {object} PostListResponse "success"
@@ -93,6 +95,16 @@ func (p PostHandler) List(c *gin.Context) {
 	pageFilter := c.Query("filter")
 	userId := c.Query("user_id")
 	imageMode := c.Query("image_mode") == "true"
+	onlyMe := c.Query("only_me") == "true"
+	if onlyMe {
+		userIdFromToken, exists := c.Get("user_id")
+		if !exists {
+			app.ResponseError(c, http.StatusInternalServerError,
+				"user_id not exists, but set onlyMe")
+			return
+		}
+		userId = userIdFromToken.(string)
+	}
 	if errPage != nil || errPageSize != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"page or page_size param error.")
