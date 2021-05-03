@@ -9,6 +9,7 @@ build:
 	go build .
 	rm ./build/forum
 	mv ./forum build
+	cp -r ./storage build
 
 test:build
 	cd ./build; ./forum

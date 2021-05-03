@@ -18,7 +18,6 @@ func (m *Message) TableName() string {
 }
 
 func (m *Message) Create(db *gorm.DB) error {
-	// todo: at others only once
 	return db.Create(m).Error
 }
 

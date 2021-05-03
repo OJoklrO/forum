@@ -167,7 +167,6 @@ type PostCreateResponse struct {
 // @Success 200 {object} PostCreateResponse "success"
 // @Router /api/v1/posts [post]
 func (p PostHandler) Create(c *gin.Context) {
-	// todo: create a post with emoji, will => have no comment => a post have no comment
 	param := service.CreatePostRequest{}
 
 	err := c.ShouldBind(&param)
