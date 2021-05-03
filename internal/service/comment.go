@@ -45,7 +45,7 @@ func (svc *Service) CreateComment(param *CreateCommentRequest) (*model.Comment, 
 		UserID:  svc.ctx.Value("user_id").(string),
 		PostID:  param.PostID,
 		Content: param.Content,
-		Time:    time.Now().Format("2006-01-02"),
+		Time:    time.Now().Unix(),
 	}
 	err := comment.Create(svc.db)
 	if err != nil {
@@ -95,7 +95,7 @@ func (svc *Service) EditComment(param *EditCommentRequest) error {
 		PostID:   param.PostID,
 		ID:       param.ID,
 		Content:  param.Content,
-		Time:     time.Now().Format("2006-01-02"),
+		Time:     time.Now().Unix(),
 		IsEdited: true,
 	}
 	err := comment.Update(svc.db)

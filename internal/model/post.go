@@ -10,7 +10,7 @@ type Post struct {
 	UserID       string `json:"user_id"`
 	ReplyUserID  string `json:"reply_user_id"`
 	IsDel        uint8  `json:"is_del"`
-	LatestReply  string `json:"latest_reply"`
+	LatestReply  int64  `json:"latest_reply"`
 	CommentCount uint32 `json:"comment_count"`
 }
 

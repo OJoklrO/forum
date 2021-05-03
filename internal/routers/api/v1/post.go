@@ -16,9 +16,14 @@ func NewPost() PostHandler {
 }
 
 type Post struct {
-	model.Post
-	VoteUp   int `json:"vote_up"`
-	VoteDown int `json:"vote_down"`
+	ID           uint32 `gorm:"primary_key" json:"id"`
+	Title        string `json:"title"`
+	UserID       string `json:"user_id"`
+	ReplyUserID  string `json:"reply_user_id"`
+	LatestReply  string `json:"latest_reply"` // changed
+	CommentCount uint32 `json:"comment_count"`
+	VoteUp       int    `json:"vote_up"`
+	VoteDown     int    `json:"vote_down"`
 }
 
 // @Summary Get a post by id
@@ -52,9 +57,14 @@ func (p PostHandler) Get(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, Post{
-		VoteUp:   voteUp,
-		VoteDown: voteDown,
-		Post:     *post,
+		ID:           post.ID,
+		Title:        post.Title,
+		UserID:       post.UserID,
+		ReplyUserID:  post.ReplyUserID,
+		LatestReply:  app.TimeFormat(post.LatestReply),
+		CommentCount: post.CommentCount,
+		VoteUp:       voteUp,
+		VoteDown:     voteDown,
 	})
 }
 
@@ -104,7 +114,7 @@ func (p PostHandler) List(c *gin.Context) {
 		return
 	}
 
-	var respPosts []Post = make([]Post, 0)
+	var respPosts = make([]Post, 0)
 	for _, v := range posts {
 		voteUp, voteDown, err := svc.GetVotes(1, v.ID)
 		if err != nil {
@@ -113,9 +123,14 @@ func (p PostHandler) List(c *gin.Context) {
 			return
 		}
 		respPosts = append(respPosts, Post{
-			Post:     *v,
-			VoteUp:   voteUp,
-			VoteDown: voteDown,
+			VoteUp:       voteUp,
+			VoteDown:     voteDown,
+			ID:           v.ID,
+			Title:        v.Title,
+			UserID:       v.UserID,
+			ReplyUserID:  v.ReplyUserID,
+			LatestReply:  app.TimeFormat(v.LatestReply),
+			CommentCount: v.CommentCount,
 		})
 	}
 

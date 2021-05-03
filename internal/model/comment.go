@@ -9,7 +9,7 @@ type Comment struct {
 	PostID   uint32 `json:"post_id"`
 	UserID   string `json:"user_id"`
 	Content  string `json:"content"`
-	Time     string `json:"time"`
+	Time     int64  `json:"time"`
 	IsDel    bool   `json:"is_del"`
 	IsEdited bool   `json:"is_edited"`
 }

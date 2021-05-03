@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"forum/internal/model"
 	"forum/internal/service"
 	"forum/pkg/app"
 	"github.com/gin-gonic/gin"
@@ -16,9 +15,14 @@ func NewComment() CommentHandler {
 }
 
 type Comment struct {
-	model.Comment
-	VoteUp   int `json:"vote_up"`
-	VoteDown int `json:"vote_down"`
+	ID       uint32 `json:"id"`
+	PostID   uint32 `json:"post_id"`
+	UserID   string `json:"user_id"`
+	Content  string `json:"content"`
+	Time     string `json:"time"` // change to string
+	IsEdited bool   `json:"is_edited"`
+	VoteUp   int    `json:"vote_up"`
+	VoteDown int    `json:"vote_down"`
 }
 
 type CommentListResponse struct {
@@ -82,9 +86,14 @@ func (comment *CommentHandler) List(c *gin.Context) {
 			return
 		}
 		newItem := Comment{
+			ID:       v.ID,
+			PostID:   v.PostID,
+			UserID:   v.UserID,
+			Content:  v.Content,
+			Time:     app.TimeFormat(v.Time),
+			IsEdited: v.IsEdited,
 			VoteUp:   voteUp,
 			VoteDown: voteDown,
-			Comment:  *v,
 		}
 		respComments = append(respComments, newItem)
 	}
@@ -205,11 +214,18 @@ func (comment *CommentHandler) Get(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, Comment{
-		Comment:  *targetComment,
+	responseComment := Comment{
+		ID:       targetComment.ID,
+		PostID:   targetComment.PostID,
+		UserID:   targetComment.UserID,
+		Content:  targetComment.Content,
+		Time:     app.TimeFormat(targetComment.Time),
+		IsEdited: targetComment.IsEdited,
 		VoteUp:   voteUp,
 		VoteDown: voteDown,
-	})
+	}
+
+	c.JSON(http.StatusOK, responseComment)
 }
 
 // @Summary Vote on a comment.
