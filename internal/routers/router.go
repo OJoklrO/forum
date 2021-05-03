@@ -35,40 +35,40 @@ func NewRouter() *gin.Engine {
 	apiV1 := r.Group("api/v1")
 	{
 		apiV1.GET("/forum/info", v1.GetForumInfo)
-		apiV1.POST("/upload", middleware.JWT(), v1.UploadImage)
+		apiV1.POST("/upload", middleware.JWT(true), v1.UploadImage)
 
 		apiV1.POST("/accounts/login", v1.Login)
 		apiV1.POST("/accounts/register", v1.Register)
-		apiV1.POST("/accounts/reset-password", middleware.JWT(), v1.ResetPassword)
-		apiV1.DELETE("/accounts/:id", middleware.JWT(), v1.DeleteAccount)
+		apiV1.POST("/accounts/reset-password", middleware.JWT(true), v1.ResetPassword)
+		apiV1.DELETE("/accounts/:id", middleware.JWT(true), v1.DeleteAccount)
 		apiV1.GET("/accounts/:id", v1.GetAccountInfo)
-		apiV1.PUT("/accounts", middleware.JWT(), v1.EditAccountInfo)
+		apiV1.PUT("/accounts", middleware.JWT(true), v1.EditAccountInfo)
 
-		apiV1.GET("/me/account", middleware.JWT(), v1.GetMyAccountInfo)
+		apiV1.GET("/me/account", middleware.JWT(true), v1.GetMyAccountInfo)
 
 		post := v1.NewPost()
 		apiV1.GET("/posts", post.List)
 		apiV1.GET("/posts/:id", post.Get)
-		apiV1.POST("/posts", middleware.JWT(), post.Create)
-		apiV1.DELETE("/posts/:id", middleware.JWT(), post.Delete)
-		apiV1.GET("/posts/:id/pin", middleware.JWT(), post.Pin)
+		apiV1.POST("/posts", middleware.JWT(true), post.Create)
+		apiV1.DELETE("/posts/:id", middleware.JWT(true), post.Delete)
+		apiV1.GET("/posts/:id/pin", middleware.JWT(true), post.Pin)
 
 		comment := v1.NewComment()
 		apiV1.GET("/comments/:post_id", comment.List)
-		apiV1.POST("/comments", middleware.JWT(), comment.Create)
-		apiV1.PUT("/comments", middleware.JWT(), comment.Edit)
-		apiV1.DELETE("/comments/:post_id/:id", middleware.JWT(), comment.Delete)
+		apiV1.POST("/comments", middleware.JWT(true), comment.Create)
+		apiV1.PUT("/comments", middleware.JWT(true), comment.Edit)
+		apiV1.DELETE("/comments/:post_id/:id", middleware.JWT(true), comment.Delete)
 		apiV1.GET("/comments/:post_id/:id", comment.Get)
-		apiV1.GET("/comments/:post_id/:id/vote/:support", middleware.JWT(), comment.Vote)
+		apiV1.GET("/comments/:post_id/:id/vote/:support", middleware.JWT(true), comment.Vote)
 
-		apiV1.GET("/checkin", middleware.JWT(), v1.CheckIn)
-		apiV1.GET("/checkin/records", middleware.JWT(), v1.GetCheckInRecords)
+		apiV1.GET("/checkin", middleware.JWT(true), v1.CheckIn)
+		apiV1.GET("/checkin/records", middleware.JWT(true), v1.GetCheckInRecords)
 
 		apiV1.GET("/top", v1.GetTop)
 
-		apiV1.GET("/messages", middleware.JWT(), v1.GetMessageList)
-		apiV1.GET("/messages/unread", middleware.JWT(), v1.GetUnreadMessageCount)
-		apiV1.GET("/messages/:post_id/:comment_id", middleware.JWT(), v1.ReadMessage)
+		apiV1.GET("/messages", middleware.JWT(true), v1.GetMessageList)
+		apiV1.GET("/messages/unread", middleware.JWT(true), v1.GetUnreadMessageCount)
+		apiV1.GET("/messages/:post_id/:comment_id", middleware.JWT(true), v1.ReadMessage)
 	}
 
 	return r

@@ -13,30 +13,8 @@ import (
 // @Success 200 {object} service.AccountInfo "success"
 // @Router /api/v1/accounts/{id} [get]
 func GetAccountInfo(c *gin.Context) {
-	// todo: account info, is admin
 	svc := service.New(c)
 	account, err := svc.GetUserInfo(c.Params.ByName("id"))
-	if err != nil {
-		app.ResponseError(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-
-	c.JSON(http.StatusOK, account)
-}
-
-// @Summary Get account information of myself.
-// @Produce json
-// @Param token header string true "token"
-// @Success 200 {object} service.AccountInfo "success"
-// @Router /api/v1/me/account [get]
-func GetMyAccountInfo(c *gin.Context) {
-	svc := service.New(c)
-	id, exists := c.Get("user_id")
-	if !exists {
-		app.ResponseError(c, http.StatusInternalServerError, "user_id not exists")
-		return
-	}
-	account, err := svc.GetUserInfo(id.(string))
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError, err.Error())
 		return
@@ -70,4 +48,23 @@ func EditAccountInfo(c *gin.Context) {
 	c.JSON(http.StatusOK, MessageResponse{"success."})
 }
 
-// todo: get user's comments and posts
+// @Summary Get account information of myself.
+// @Produce json
+// @Param token header string true "token"
+// @Success 200 {object} service.AccountInfo "success"
+// @Router /api/v1/me/account [get]
+func GetMyAccountInfo(c *gin.Context) {
+	svc := service.New(c)
+	id, exists := c.Get("user_id")
+	if !exists {
+		app.ResponseError(c, http.StatusInternalServerError, "user_id not exists")
+		return
+	}
+	account, err := svc.GetUserInfo(id.(string))
+	if err != nil {
+		app.ResponseError(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, account)
+}

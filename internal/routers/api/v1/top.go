@@ -19,7 +19,7 @@ type TopResponse struct {
 func GetTop(c *gin.Context) {
 	// todo: a more reasonable top news rules("/top")
 	svc := service.New(c)
-	posts, _, err := svc.GetPostList(1, 5, "", false)
+	posts, _, err := svc.GetPostList(1, 5, "", false, "")
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.GetPostList err: "+err.Error())

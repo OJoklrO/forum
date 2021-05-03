@@ -81,6 +81,7 @@ type PostListResponse struct {
 // @Produce json
 // @Param page query int true "Page number" default(1)
 // @Param page_size query int true "Page size" default(20)
+// @Param user_id query string false "User id"
 // @Param filter query string false "Filter"
 // @Param image_mode query bool false "Enable image mode" default(false)
 // @Success 200 {object} PostListResponse "success"
@@ -90,6 +91,7 @@ func (p PostHandler) List(c *gin.Context) {
 	page, errPage := strconv.Atoi(c.Query("page"))
 	pageSize, errPageSize := strconv.Atoi(c.Query("page_size"))
 	pageFilter := c.Query("filter")
+	userId := c.Query("user_id")
 	imageMode := c.Query("image_mode") == "true"
 	if errPage != nil || errPageSize != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
@@ -97,7 +99,7 @@ func (p PostHandler) List(c *gin.Context) {
 		return
 	}
 
-	posts, count, err := svc.GetPostList(page, pageSize, pageFilter, imageMode)
+	posts, count, err := svc.GetPostList(page, pageSize, pageFilter, imageMode, userId)
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.GetPostList err: "+err.Error())

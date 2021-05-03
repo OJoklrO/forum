@@ -19,20 +19,10 @@ func (p Post) TableName() string {
 	return "post"
 }
 
-func (p Post) CountAll(db *gorm.DB, filter string, imageOnly bool) (int, error) {
-	// todo: (warning) duplicated with List()
+func (p Post) CountAll(db *gorm.DB, filter string, imageOnly bool, userId string) (int, error) {
+	db = postListSearchDB(db, filter, imageOnly, userId)
 	var count int
-	imageSQL := ""
-	if imageOnly {
-		imageSQL = " AND comment.content LIKE '%<img%src=%>%' AND comment.id = 1"
-	}
-	err := db.Model(Post{}).
-		Joins("join comment on comment.post_id =post.id").
-		Where("post.is_del = ? AND post.title LIKE ?"+imageSQL, 0, "%"+filter+"%").
-		Or("comment.is_del = ? AND comment.content LIKE ?"+imageSQL, 0, "%"+filter+"%").
-		Group("post.id").
-		Count(&count).Error
-
+	err := db.Count(&count).Error
 	if err != nil {
 		return 0, err
 	}
@@ -52,24 +42,31 @@ func (p *Post) Get(db *gorm.DB) error {
 	return db.Model(p).Where("id = ? AND is_del = ?", p.ID, 0).Find(p).Error
 }
 
-func (p Post) List(db *gorm.DB, pageOffset, pageSize int, filter string, imageOnly bool) ([]*Post, error) {
+func postListSearchDB(db *gorm.DB, filter string, imageOnly bool, userID string) *gorm.DB {
+	query := "((post.is_del = 0 AND post.title LIKE ?) OR (comment.is_del = 0 AND comment.content LIKE ?))"
+	if imageOnly {
+		query += " AND (comment.content LIKE '%<img%src=%>%' AND comment.id = 1)"
+	}
+
+	if len(userID) != 0 {
+		query += " AND post.user_id = '" + userID + "' "
+	}
+
+	return db.Model(Post{}).Joins("join comment on comment.post_id =post.id").
+		Group("post.id").
+		Where(query, "%"+filter+"%", "%"+filter+"%")
+}
+
+func (p Post) List(db *gorm.DB, pageOffset, pageSize int, filter string, imageOnly bool, userId string) ([]*Post, error) {
 	var posts []*Post
-	var err error
 	if pageOffset >= 0 && pageSize > 0 {
 		db = db.Offset(pageOffset).Limit(pageSize)
 	}
 
-	imageSQL := ""
-	if imageOnly {
-		imageSQL = " AND comment.content LIKE '%<img%src=%>%' AND comment.id = 1"
-	}
-	if err = db.Model(Post{}).
-		Joins("join comment on comment.post_id =post.id").
-		Where("post.is_del = ? AND post.title LIKE ?"+imageSQL, 0, "%"+filter+"%").
-		Or("comment.is_del = ? AND comment.content LIKE ?"+imageSQL, 0, "%"+filter+"%").
-		Order("pinned desc, latest_reply desc").
-		Group("post.id").
-		Find(&posts).Error; err != nil {
+	db = postListSearchDB(db, filter, imageOnly, userId)
+	if err := db.Order("pinned desc, latest_reply desc").
+		Find(&posts).Error;
+		err != nil {
 		return nil, err
 	}
 	return posts, nil

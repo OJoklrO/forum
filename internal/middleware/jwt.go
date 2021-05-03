@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func JWT() gin.HandlerFunc {
+func JWT(strict bool) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var (
 			token string
@@ -20,7 +20,9 @@ func JWT() gin.HandlerFunc {
 
 		if token == "" {
 			app.ResponseError(c, http.StatusUnauthorized, "the token is empty")
-			c.Abort()
+			if strict {
+				c.Abort()
+			}
 			return
 		}
 

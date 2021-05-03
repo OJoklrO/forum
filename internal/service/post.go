@@ -17,17 +17,17 @@ func (svc *Service) GetPost(param *GetPostRequest) (*model.Post, error) {
 	return p, err
 }
 
-func (svc *Service) GetPostList(page, pageSize int, filter string, imageMode bool) ([]*model.Post, int, error) {
+func (svc *Service) GetPostList(page, pageSize int, filter string, imageMode bool, userId string) ([]*model.Post, int, error) {
 	p := model.Post{}
 	pageOffset := 0
 	if page > 0 {
 		pageOffset = (page - 1) * pageSize
 	}
-	posts, err := p.List(svc.db, pageOffset, pageSize, filter, imageMode)
+	posts, err := p.List(svc.db, pageOffset, pageSize, filter, imageMode, userId)
 	if err != nil {
 		return nil, 0, err
 	}
-	count, err := p.CountAll(svc.db, filter, imageMode)
+	count, err := p.CountAll(svc.db, filter, imageMode, userId)
 	if err != nil {
 		return nil, 0, err
 	}
