@@ -86,7 +86,7 @@ func (svc *Service) DeleteAccount(param *DeleteAccountRequest) error {
 	return auth.Delete(svc.db)
 }
 
-func (svc *Service) IsAdmin() (bool, error) {
+func (svc *Service) CheckAdminPermission() (bool, error) {
 	id := svc.ctx.Value("user_id").(string)
 	admin := model.Admin{ID: id}
 	return admin.Exist(svc.db)
@@ -94,7 +94,7 @@ func (svc *Service) IsAdmin() (bool, error) {
 
 func (svc *Service) CheckCommonPermission(ownerId string) error {
 	if ownerId != svc.ctx.Value("user_id").(string) {
-		isAdmin, err := svc.IsAdmin()
+		isAdmin, err := svc.CheckAdminPermission()
 		if err != nil {
 			return err
 		}

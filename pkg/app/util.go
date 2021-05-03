@@ -31,7 +31,7 @@ func TimeFormat(unixTime int64) (timeStr string) {
 	} else if thisYear.Before(commentTime) {
 		timeStr = commentTime.Format("01-02")
 	} else {
-		timeStr = commentTime.Format("2006-01-02 GMT+8")
+		timeStr = commentTime.Format("2006-01-02")
 	}
 	return
 }

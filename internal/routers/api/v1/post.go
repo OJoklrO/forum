@@ -22,6 +22,7 @@ type Post struct {
 	ReplyUserID  string `json:"reply_user_id"`
 	LatestReply  string `json:"latest_reply"` // changed
 	CommentCount uint32 `json:"comment_count"`
+	Pinned       bool   `json:"pinned"` // changed
 	VoteUp       int    `json:"vote_up"`
 	VoteDown     int    `json:"vote_down"`
 }
@@ -63,6 +64,7 @@ func (p PostHandler) Get(c *gin.Context) {
 		ReplyUserID:  post.ReplyUserID,
 		LatestReply:  app.TimeFormat(post.LatestReply),
 		CommentCount: post.CommentCount,
+		Pinned:       post.Pinned == 2,
 		VoteUp:       voteUp,
 		VoteDown:     voteDown,
 	})
@@ -79,35 +81,23 @@ type PostListResponse struct {
 // @Produce json
 // @Param page query int true "Page number" default(1)
 // @Param page_size query int true "Page size" default(20)
-// @Param filter query string true "Filter"
+// @Param filter query string false "Filter"
 // @Param image_mode query bool false "Enable image mode" default(false)
 // @Success 200 {object} PostListResponse "success"
 // @Router /api/v1/posts [get]
 func (p PostHandler) List(c *gin.Context) {
 	svc := service.New(c)
-	count, err := svc.CountPosts()
-	if err != nil {
-		app.ResponseError(c, http.StatusInternalServerError,
-			"svc.CountPosts err: "+err.Error())
-		return
-	}
-
 	page, errPage := strconv.Atoi(c.Query("page"))
 	pageSize, errPageSize := strconv.Atoi(c.Query("page_size"))
 	pageFilter := c.Query("filter")
-	// todo: search filter
-	// todo: pin post
-	// todo: sort posts
-	// todo: posts image mode
-	// todo: time format
-	//imageMode := c.Query("image_mode") == "true"
+	imageMode := c.Query("image_mode") == "true"
 	if errPage != nil || errPageSize != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"page or page_size param error.")
 		return
 	}
 
-	posts, err := svc.GetPostList(page, pageSize, pageFilter)
+	posts, count, err := svc.GetPostList(page, pageSize, pageFilter, imageMode)
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.GetPostList err: "+err.Error())
@@ -131,6 +121,7 @@ func (p PostHandler) List(c *gin.Context) {
 			ReplyUserID:  v.ReplyUserID,
 			LatestReply:  app.TimeFormat(v.LatestReply),
 			CommentCount: v.CommentCount,
+			Pinned:       v.Pinned == 2,
 		})
 	}
 
@@ -211,4 +202,24 @@ type PostImageListResponse struct {
 	Posts      []*model.Post `json:"posts"`
 	Images     []string      `json:"images"`
 	TotalPages int           `json:"total_pages"`
+}
+
+// @Summary Pin a post.
+// @Produce json
+// @Param id path int true "post id"
+// @Param token header string true "jwt token"
+// @Success 200 {object} MessageResponse "success"
+// @Router /api/v1/posts/{id}/pin [get]
+func (p PostHandler) Pin(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		app.ResponseError(c, http.StatusBadRequest, err.Error())
+	}
+
+	svc := service.New(c)
+	err = svc.SetPostPinned(uint32(id))
+	if err != nil {
+		app.ResponseError(c, http.StatusInternalServerError, err.Error())
+	}
+	c.JSON(http.StatusOK, MessageResponse{"success."})
 }

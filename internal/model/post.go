@@ -10,6 +10,7 @@ type Post struct {
 	UserID       string `json:"user_id"`
 	ReplyUserID  string `json:"reply_user_id"`
 	IsDel        uint8  `json:"is_del"`
+	Pinned       uint8  `json:"pinned"`
 	LatestReply  int64  `json:"latest_reply"`
 	CommentCount uint32 `json:"comment_count"`
 }
@@ -18,9 +19,20 @@ func (p Post) TableName() string {
 	return "post"
 }
 
-func (p Post) CountAll(db *gorm.DB) (int, error) {
+func (p Post) CountAll(db *gorm.DB, filter string, imageOnly bool) (int, error) {
+	// todo: (warning) duplicated with List()
 	var count int
-	err := db.Model(&p).Where("is_del = ?", 0).Count(&count).Error
+	imageSQL := ""
+	if imageOnly {
+		imageSQL = " AND comment.content LIKE '%<img%src=%>%' AND comment.id = 1"
+	}
+	err := db.Model(Post{}).
+		Joins("join comment on comment.post_id =post.id").
+		Where("post.is_del = ? AND post.title LIKE ?"+imageSQL, 0, "%"+filter+"%").
+		Or("comment.is_del = ? AND comment.content LIKE ?"+imageSQL, 0, "%"+filter+"%").
+		Group("post.id").
+		Count(&count).Error
+
 	if err != nil {
 		return 0, err
 	}
@@ -36,20 +48,28 @@ func (p *Post) CountByUser(db *gorm.DB) (int, error) {
 	return count, nil
 }
 
-func (p Post) Get(db *gorm.DB) (*Post, error) {
-	var post Post
-	err := db.Model(post).Where("id = ? AND is_del = ?", p.ID, 0).Find(&post).Error
-	return &post, err
+func (p *Post) Get(db *gorm.DB) error {
+	return db.Model(p).Where("id = ? AND is_del = ?", p.ID, 0).Find(p).Error
 }
 
-func (p Post) List(db *gorm.DB, pageOffset, pageSize int, filter string) ([]*Post, error) {
+func (p Post) List(db *gorm.DB, pageOffset, pageSize int, filter string, imageOnly bool) ([]*Post, error) {
 	var posts []*Post
 	var err error
 	if pageOffset >= 0 && pageSize > 0 {
 		db = db.Offset(pageOffset).Limit(pageSize)
 	}
-	if err = db.Model(Post{}).Where("is_del = ?", 0).
-		Order("latest_reply desc").Find(&posts).Error; err != nil {
+
+	imageSQL := ""
+	if imageOnly {
+		imageSQL = " AND comment.content LIKE '%<img%src=%>%' AND comment.id = 1"
+	}
+	if err = db.Model(Post{}).
+		Joins("join comment on comment.post_id =post.id").
+		Where("post.is_del = ? AND post.title LIKE ?"+imageSQL, 0, "%"+filter+"%").
+		Or("comment.is_del = ? AND comment.content LIKE ?"+imageSQL, 0, "%"+filter+"%").
+		Order("pinned desc, latest_reply desc").
+		Group("post.id").
+		Find(&posts).Error; err != nil {
 		return nil, err
 	}
 	return posts, nil

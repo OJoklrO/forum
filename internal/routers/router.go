@@ -51,6 +51,7 @@ func NewRouter() *gin.Engine {
 		apiV1.GET("/posts/:id", post.Get)
 		apiV1.POST("/posts", middleware.JWT(), post.Create)
 		apiV1.DELETE("/posts/:id", middleware.JWT(), post.Delete)
+		apiV1.GET("/posts/:id/pin", middleware.JWT(), post.Pin)
 
 		comment := v1.NewComment()
 		apiV1.GET("/comments/:post_id", comment.List)

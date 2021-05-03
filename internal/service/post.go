@@ -1,32 +1,38 @@
 package service
 
 import (
+	"errors"
 	"forum/internal/model"
 )
-
-func (svc *Service) CountPosts() (int, error) {
-	p := model.Post{}
-	return p.CountAll(svc.db)
-}
 
 type GetPostRequest struct {
 	ID uint32 `form:"id" binding:"required,gte=1"`
 }
 
 func (svc *Service) GetPost(param *GetPostRequest) (*model.Post, error) {
-	p := model.Post{
+	p := &model.Post{
 		ID: param.ID,
 	}
-	return p.Get(svc.db)
+	err := p.Get(svc.db)
+	return p, err
 }
 
-func (svc *Service) GetPostList(page, pageSize int, filter string) ([]*model.Post, error) {
+func (svc *Service) GetPostList(page, pageSize int, filter string, imageMode bool) ([]*model.Post, int, error) {
 	p := model.Post{}
 	pageOffset := 0
 	if page > 0 {
 		pageOffset = (page - 1) * pageSize
 	}
-	return p.List(svc.db, pageOffset, pageSize, filter)
+	posts, err := p.List(svc.db, pageOffset, pageSize, filter, imageMode)
+	if err != nil {
+		return nil, 0, err
+	}
+	count, err := p.CountAll(svc.db, filter, imageMode)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return posts, count, nil
 }
 
 type CreatePostRequest struct {
@@ -76,4 +82,28 @@ func (svc *Service) DeletePost(param *DeletePostRequest) error {
 
 	comment := &model.Comment{PostID: p.ID, IsDel: true}
 	return comment.UpdateAllByPost(svc.db)
+}
+
+func (svc *Service) SetPostPinned(id uint32) error {
+	admin, err := svc.CheckAdminPermission()
+	if err != nil {
+		return err
+	}
+	if !admin {
+		return errors.New("permission denied, you are not an admin")
+	}
+
+	post := &model.Post{ID: id}
+	err = post.Get(svc.db)
+	if err != nil {
+		return err
+	}
+
+	if post.Pinned == 1 {
+		post.Pinned = 2
+	} else {
+		post.Pinned = 1
+	}
+
+	return post.Update(svc.db)
 }
