@@ -13,6 +13,7 @@ type AccountInfo struct {
 	Level        uint32 `json:"level"`
 	CommentCount int    `json:"comment_count"`
 	PostCount    int    `json:"post_count"`
+	IsAdmin      bool   `json:"is_admin"`
 }
 
 func (svc *Service) GetUserInfo(id string) (*AccountInfo, error) {
@@ -34,6 +35,11 @@ func (svc *Service) GetUserInfo(id string) (*AccountInfo, error) {
 		return nil, err
 	}
 
+	isAdmin, err := svc.IsAdmin(account.ID)
+	if err != nil {
+		return nil, err
+	}
+
 	return &AccountInfo{
 		ID:           account.ID,
 		Name:         account.Name,
@@ -43,6 +49,7 @@ func (svc *Service) GetUserInfo(id string) (*AccountInfo, error) {
 		Level:        account.Level,
 		CommentCount: commentCount,
 		PostCount:    postCount,
+		IsAdmin:      isAdmin,
 	}, nil
 }
 

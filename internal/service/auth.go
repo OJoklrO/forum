@@ -86,6 +86,11 @@ func (svc *Service) DeleteAccount(param *DeleteAccountRequest) error {
 	return auth.Delete(svc.db)
 }
 
+func (svc *Service) IsAdmin(id string) (bool, error) {
+	admin := model.Admin{ID: id}
+	return admin.Exist(svc.db)
+}
+
 func (svc *Service) CheckAdminPermission() (bool, error) {
 	id := svc.ctx.Value("user_id").(string)
 	admin := model.Admin{ID: id}
