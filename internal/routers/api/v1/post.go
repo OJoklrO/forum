@@ -25,11 +25,13 @@ type Post struct {
 	Pinned       bool   `json:"pinned"` // changed
 	VoteUp       int    `json:"vote_up"`
 	VoteDown     int    `json:"vote_down"`
+	VoteStatus   int    `json:"vote_status"`
 }
 
 // @Summary Get a post by id
 // @Produce json
 // @Param id path int true "Post ID"
+// @Param token header string false "jwt token"
 // @Success 200 {object} Post "Post data"
 // @Router /api/v1/posts/{id} [get]
 func (p PostHandler) Get(c *gin.Context) {
@@ -50,7 +52,7 @@ func (p PostHandler) Get(c *gin.Context) {
 		return
 	}
 
-	voteUp, voteDown, err := svc.GetVotes(1, post.ID)
+	voteUp, voteDown, voteStatus, err := svc.GetVotes(1, post.ID)
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.GetVotes error "+err.Error())
@@ -67,6 +69,7 @@ func (p PostHandler) Get(c *gin.Context) {
 		Pinned:       post.Pinned == 2,
 		VoteUp:       voteUp,
 		VoteDown:     voteDown,
+		VoteStatus:   voteStatus,
 	})
 }
 
@@ -83,7 +86,7 @@ type PostListResponse struct {
 // @Param page_size query int true "Page size" default(20)
 // @Param user_id query string false "User id"
 // @Param only_me query bool false "User id"
-// @Param token header string false "jwt token(if checked only_me)"
+// @Param token header string false "jwt token"
 // @Param filter query string false "Filter"
 // @Param image_mode query bool false "Enable image mode" default(false)
 // @Success 200 {object} PostListResponse "success"
@@ -120,7 +123,7 @@ func (p PostHandler) List(c *gin.Context) {
 
 	var respPosts = make([]Post, 0)
 	for _, v := range posts {
-		voteUp, voteDown, err := svc.GetVotes(1, v.ID)
+		voteUp, voteDown, voteStatus, err := svc.GetVotes(1, v.ID)
 		if err != nil {
 			app.ResponseError(c, http.StatusInternalServerError,
 				"svc.GetVotes error "+err.Error())
@@ -129,6 +132,7 @@ func (p PostHandler) List(c *gin.Context) {
 		respPosts = append(respPosts, Post{
 			VoteUp:       voteUp,
 			VoteDown:     voteDown,
+			VoteStatus:   voteStatus,
 			ID:           v.ID,
 			Title:        v.Title,
 			UserID:       v.UserID,

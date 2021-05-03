@@ -15,14 +15,15 @@ func NewComment() CommentHandler {
 }
 
 type Comment struct {
-	ID       uint32 `json:"id"`
-	PostID   uint32 `json:"post_id"`
-	UserID   string `json:"user_id"`
-	Content  string `json:"content"`
-	Time     string `json:"time"` // change to string
-	IsEdited bool   `json:"is_edited"`
-	VoteUp   int    `json:"vote_up"`
-	VoteDown int    `json:"vote_down"`
+	ID         uint32 `json:"id"`
+	PostID     uint32 `json:"post_id"`
+	UserID     string `json:"user_id"`
+	Content    string `json:"content"`
+	Time       string `json:"time"` // change to string
+	IsEdited   bool   `json:"is_edited"`
+	VoteUp     int    `json:"vote_up"`
+	VoteDown   int    `json:"vote_down"`
+	VoteStatus int    `json:"vote_status"`
 }
 
 type CommentListResponse struct {
@@ -37,10 +38,10 @@ type CommentListResponse struct {
 // @Param page query int true "page number" default(1)
 // @Param page_size query int true "page size" default(20)
 // @Param filter query string false "filter"
+// @Param token header string false "jwt token"
 // @Success 200 {object} CommentListResponse "success"
 // @Router /api/v1/comments/{post_id} [get]
 func (comment *CommentHandler) List(c *gin.Context) {
-	// todo: return like status depending on jwt (user)
 	postID, err := strconv.Atoi(c.Param("post_id"))
 	if err != nil {
 		app.ResponseError(c, http.StatusBadRequest, "param error.")
@@ -79,21 +80,22 @@ func (comment *CommentHandler) List(c *gin.Context) {
 
 	var respComments []Comment
 	for _, v := range comments {
-		voteUp, voteDown, err := svc.GetVotes(v.ID, v.PostID)
+		voteUp, voteDown, voteStatus, err := svc.GetVotes(v.ID, v.PostID)
 		if err != nil {
 			app.ResponseError(c, http.StatusInternalServerError,
 				"svc.GetVotes err: "+err.Error())
 			return
 		}
 		newItem := Comment{
-			ID:       v.ID,
-			PostID:   v.PostID,
-			UserID:   v.UserID,
-			Content:  v.Content,
-			Time:     app.TimeFormat(v.Time),
-			IsEdited: v.IsEdited,
-			VoteUp:   voteUp,
-			VoteDown: voteDown,
+			ID:         v.ID,
+			PostID:     v.PostID,
+			UserID:     v.UserID,
+			Content:    v.Content,
+			Time:       app.TimeFormat(v.Time),
+			IsEdited:   v.IsEdited,
+			VoteUp:     voteUp,
+			VoteDown:   voteDown,
+			VoteStatus: voteStatus,
 		}
 		respComments = append(respComments, newItem)
 	}
@@ -190,6 +192,7 @@ func (comment *CommentHandler) Edit(c *gin.Context) {
 // @Produce json
 // @Param post_id path int true "post id"
 // @Param id path int true "comment id"
+// @Param token header string false "jwt token"
 // @Success 200 {object} model.Comment "success"
 // @Router /api/v1/comments/{post_id}/{id} [get]
 func (comment *CommentHandler) Get(c *gin.Context) {
@@ -207,7 +210,7 @@ func (comment *CommentHandler) Get(c *gin.Context) {
 		return
 	}
 
-	voteUp, voteDown, err := svc.GetVotes(uint32(id), uint32(postId))
+	voteUp, voteDown, voteStatus, err := svc.GetVotes(uint32(id), uint32(postId))
 	if err != nil {
 		app.ResponseError(c, http.StatusInternalServerError,
 			"svc.GetVotes err: "+err.Error())
@@ -215,14 +218,15 @@ func (comment *CommentHandler) Get(c *gin.Context) {
 	}
 
 	responseComment := Comment{
-		ID:       targetComment.ID,
-		PostID:   targetComment.PostID,
-		UserID:   targetComment.UserID,
-		Content:  targetComment.Content,
-		Time:     app.TimeFormat(targetComment.Time),
-		IsEdited: targetComment.IsEdited,
-		VoteUp:   voteUp,
-		VoteDown: voteDown,
+		ID:         targetComment.ID,
+		PostID:     targetComment.PostID,
+		UserID:     targetComment.UserID,
+		Content:    targetComment.Content,
+		Time:       app.TimeFormat(targetComment.Time),
+		IsEdited:   targetComment.IsEdited,
+		VoteUp:     voteUp,
+		VoteDown:   voteDown,
+		VoteStatus: voteStatus,
 	}
 
 	c.JSON(http.StatusOK, responseComment)
@@ -232,12 +236,12 @@ func (comment *CommentHandler) Get(c *gin.Context) {
 // @Produce json
 // @Param post_id path int true "post id"
 // @Param id path int true "comment id"
-// @Param support path int true "-1 or 1"
+// @Param support path int true "-1 or 1 or 0"
 // @Param token header string true "jwt token"
 // @Success 200 {object} MessageResponse "success"
 // @Router /api/v1/comments/{post_id}/{id}/vote/{support} [get]
 func (comment *CommentHandler) Vote(c *gin.Context) {
-	// todo: cancel vote
+	// todo: test vote status(with front end)
 	id, errId := strconv.Atoi(c.Param("id"))
 	postId, errPost := strconv.Atoi(c.Param("post_id"))
 	supportValue, errVote := strconv.Atoi(c.Param("support"))
@@ -246,8 +250,8 @@ func (comment *CommentHandler) Vote(c *gin.Context) {
 		return
 	}
 
-	if !(supportValue == -1 || supportValue == 1) {
-		app.ResponseError(c, http.StatusBadRequest, "vote 'support' param should be -1 or 1.")
+	if !(supportValue == -1 || supportValue == 0 || supportValue == 1) {
+		app.ResponseError(c, http.StatusBadRequest, "vote 'support' param should be -1 or 1 or 0.")
 		return
 	}
 

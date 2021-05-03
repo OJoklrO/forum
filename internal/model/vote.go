@@ -17,7 +17,7 @@ func (v *Vote) TableName() string {
 
 func (v *Vote) SetOrCreate(db *gorm.DB) error {
 	voteValue := v.Vote
-	return db.Where("user_id = ? AND post_id = ? AND comment_id = ?", v.UserID, v.PostID, v.CommentID).Assign(Vote{Vote: voteValue}).FirstOrCreate(v).Error
+	return db.Where("user_id = ? AND post_id = ? AND comment_id = ?", v.UserID, v.PostID, v.CommentID).Assign(map[string]interface{}{"vote": voteValue}).FirstOrCreate(v).Error
 }
 
 func (v *Vote) Get(db *gorm.DB) error {

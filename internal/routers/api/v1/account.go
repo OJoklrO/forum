@@ -111,21 +111,22 @@ func GetMyComments(c *gin.Context) {
 
 	var respComments []Comment
 	for _, v := range comments {
-		voteUp, voteDown, err := svc.GetVotes(v.ID, v.PostID)
+		voteUp, voteDown, voteStatus, err := svc.GetVotes(v.ID, v.PostID)
 		if err != nil {
 			app.ResponseError(c, http.StatusInternalServerError,
 				"svc.GetVotes err: "+err.Error())
 			return
 		}
 		newItem := Comment{
-			ID:       v.ID,
-			PostID:   v.PostID,
-			UserID:   v.UserID,
-			Content:  v.Content,
-			Time:     app.TimeFormat(v.Time),
-			IsEdited: v.IsEdited,
-			VoteUp:   voteUp,
-			VoteDown: voteDown,
+			ID:         v.ID,
+			PostID:     v.PostID,
+			UserID:     v.UserID,
+			Content:    v.Content,
+			Time:       app.TimeFormat(v.Time),
+			IsEdited:   v.IsEdited,
+			VoteUp:     voteUp,
+			VoteDown:   voteDown,
+			VoteStatus: voteStatus,
 		}
 		respComments = append(respComments, newItem)
 	}

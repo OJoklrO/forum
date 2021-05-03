@@ -204,12 +204,26 @@ func (svc *Service) Vote(id, postId uint32, support int) error {
 	return v.SetOrCreate(svc.db)
 }
 
-func (svc *Service) GetVotes(id, postId uint32) (int, int, error) {
+func (svc *Service) GetVotes(id, postId uint32) (up int, down int, status int, err error) {
 	v := &model.Vote{
 		PostID:    postId,
 		CommentID: id,
 	}
-	return v.CommentVoteCount(svc.db)
+	up, down, err = v.CommentVoteCount(svc.db)
+	if err != nil {
+		return
+	}
+
+	userId, exist := svc.ctx.Get("user_id")
+	if exist {
+		v.UserID = userId.(string)
+		errVoteStatus := v.Get(svc.db)
+		if errVoteStatus != nil {
+			return // status is still 0
+		}
+		status = v.Vote
+	}
+	return
 }
 
 func (svc *Service) GetCommentBrief(id, postId uint32) (imageURLs []string, briefContent string, err error) {
