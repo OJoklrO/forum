@@ -9,6 +9,7 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -32,7 +33,7 @@ func init() {
 func main() {
 	router := routers.NewRouter()
 	s := http.Server{
-		Addr: ":" + global.ServerSetting.HttpPort,
+		Addr:    ":" + global.ServerSetting.HttpPort,
 		Handler: router,
 	}
 	log.Fatal(s.ListenAndServe())
@@ -59,6 +60,12 @@ func setupSetting() error {
 	if err != nil {
 		return err
 	}
+
+	httpPort := os.Getenv("HttpPort")
+	if len(httpPort) != 0 {
+		global.ServerSetting.HttpPort = httpPort
+	}
+
 	global.ServerSetting.ReadTimeout *= time.Second
 	global.ServerSetting.WriteTimeout *= time.Second
 	global.JWTSetting.Expire *= time.Second
@@ -74,11 +81,11 @@ func setupDBEngine() error {
 func setupLogger() error {
 	fileName := global.AppSetting.LogSavePath + "/" + global.AppSetting.LogFileName + global.AppSetting.LogFileExt
 	global.Logger = logger.NewLogger(&lumberjack.Logger{
-		Filename: fileName,
-		MaxSize: 600,
-		MaxAge: 10,
+		Filename:  fileName,
+		MaxSize:   600,
+		MaxAge:    10,
 		LocalTime: true,
-	},"", log.LstdFlags).WithCaller(2)
+	}, "", log.LstdFlags).WithCaller(2)
 
 	return nil
 }

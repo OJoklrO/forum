@@ -38,6 +38,10 @@ func GetMessageList(c *gin.Context) {
 			"svc.GetUnreadMessages: "+err.Error())
 		return
 	}
+	// for json(not null, but empty array)
+	if len(results) == 0 {
+		results = make([]*model.Message, 0)
+	}
 	c.JSON(http.StatusOK, MessageListResponse{Messages: results, Count: count})
 }
 

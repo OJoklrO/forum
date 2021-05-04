@@ -45,6 +45,7 @@ func (svc *Service) CreatePost(param *CreatePostRequest) (post *model.Post, err 
 	p := model.Post{
 		UserID: userId,
 		Title:  param.Title,
+		Pinned: 1,
 	}
 	post, err = p.Create(svc.db)
 	if err != nil {
@@ -81,7 +82,13 @@ func (svc *Service) DeletePost(param *DeletePostRequest) error {
 	}
 
 	comment := &model.Comment{PostID: p.ID, IsDel: true}
-	return comment.UpdateAllByPost(svc.db)
+	err = comment.UpdateAllByPost(svc.db)
+	if err != nil {
+		return err
+	}
+
+	message := &model.Message{PostID: p.ID}
+	return message.DeleteAllByPost(svc.db)
 }
 
 func (svc *Service) SetPostPinned(id uint32) error {

@@ -173,7 +173,12 @@ func (svc *Service) DeleteComment(id, postId uint32) error {
 	if err != nil {
 		return err
 	}
-	return comment.Delete(svc.db)
+	err = comment.Delete(svc.db)
+	if err != nil {
+		return err
+	}
+	message := &model.Message{PostID: postId, CommentID: id}
+	return message.DeleteAllByComment(svc.db)
 }
 
 func (svc *Service) GetComment(id, postId uint32) (*model.Comment, error) {

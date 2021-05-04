@@ -78,7 +78,7 @@ func (comment *CommentHandler) List(c *gin.Context) {
 		return
 	}
 
-	var respComments []Comment
+	var respComments = make([]Comment, 0)
 	for _, v := range comments {
 		voteUp, voteDown, voteStatus, err := svc.GetVotes(v.ID, v.PostID)
 		if err != nil {

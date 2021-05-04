@@ -27,6 +27,14 @@ func (m *Message) Update(db *gorm.DB) error {
 	return db.Model(m).Where(target).Update("read", m.Read).Error
 }
 
+func (m *Message) DeleteAllByPost(db *gorm.DB) error {
+	return db.Delete(Message{}, "post_id = ?", m.PostID).Error
+}
+
+func (m *Message) DeleteAllByComment(db *gorm.DB) error {
+	return db.Delete(Message{}, "post_id = ? AND comment_id = ?", m.PostID, m.CommentID).Error
+}
+
 func (m *Message) CountList(db *gorm.DB, filter string) (count int, err error) {
 	err = db.Model(m).Where("`to` = ? AND `from` LIKE ?", m.To, "%"+filter+"%").Count(&count).Error
 	if err != nil {

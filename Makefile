@@ -1,17 +1,16 @@
 .PHONY: serve build
-serve:
+init:
 	swag init
+
+# with config.yaml
+serve:init
 	go run main.go
 
-build:
-	swag init
-	mkdir build -p
-	go build .
-	rm ./build/forum
-	mv ./forum build
-	cp -r ./storage build
+test:init
+	HttpPort=8888 go run main.go
 
-test:build
-	cd ./build; ./forum
+build:init
+	CGO_ENABLED=0 go build .
 
-
+deploy:build
+	scp -r ./forum tcloud:~/mg-forum
