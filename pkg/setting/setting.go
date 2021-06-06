@@ -9,11 +9,12 @@ type Setting struct {
 	vp *viper.Viper
 }
 
-func NewSetting() (*Setting, error) {
+func NewSetting(path string) (*Setting, error) {
 	vp := viper.New()
-	vp.SetConfigName("config")
-	vp.AddConfigPath("config/")
-	vp.SetConfigType("yaml")
+	//vp.SetConfigName("config")
+	//vp.AddConfigPath("config/")
+	//vp.SetConfigType("yaml")
+	vp.SetConfigFile(path)
 	err := vp.ReadInConfig()
 	if err != nil {
 		return nil, err

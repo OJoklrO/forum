@@ -1,0 +1,40 @@
+Server:
+  RunMode: debug
+  Url: ""
+  HttpPort: 8082
+  ReadTimeout: 60
+  WriteTimeout: 60
+
+App:
+  StaticPagePath: storage/static
+  LogSavePath: storage/logs
+  LogFileName: app
+  LogFileExt: .log
+  InviteCode: xduxdu
+  UploadApi: "/upload"
+  UploadSavePath: storage/uploads
+  UploadMaxSize: 5 #MB
+  UploadExtensions:
+    - .jpg
+    - .jpeg
+    - .png
+    - .bmp
+    - .gif
+    - .svg
+
+Database:
+  DBType: mysql
+  Username: root
+  Password: owo233.
+  Host: 127.0.0.1:3306
+  DBName: forum
+  Charset: utf8mb4
+  ParseTime: True
+  MaxIdleconns: 10
+  MaxOpenConns: 30
+
+JWT:
+  Secret: asldjflasd
+  Issuer: a3-group
+  Expire: 1296000
+

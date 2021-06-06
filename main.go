@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"forum/global"
 	"forum/internal/model"
 	"forum/internal/routers"
@@ -13,8 +14,29 @@ import (
 	"time"
 )
 
-func init() {
-	err := setupSetting()
+var configPath = flag.String("config", "", "Config file path")
+
+// @title forum
+// @version 0.01
+func main() {
+	flag.Parse()
+
+	if *configPath == "" {
+		*configPath = "./config/config-dev.yaml"
+	}
+
+	appInit(*configPath)
+
+	router := routers.NewRouter()
+	s := http.Server{
+		Addr:    ":" + global.ServerSetting.HttpPort,
+		Handler: router,
+	}
+	log.Fatal(s.ListenAndServe())
+}
+
+func appInit(path string) {
+	err := setupSetting(path)
 	if err != nil {
 		log.Fatalf("init.setupSetting err: %v", err)
 	}
@@ -28,19 +50,8 @@ func init() {
 	}
 }
 
-// @title forum
-// @version 0.01
-func main() {
-	router := routers.NewRouter()
-	s := http.Server{
-		Addr:    ":" + global.ServerSetting.HttpPort,
-		Handler: router,
-	}
-	log.Fatal(s.ListenAndServe())
-}
-
-func setupSetting() error {
-	s, err := setting.NewSetting()
+func setupSetting(path string) error {
+	s, err := setting.NewSetting(path)
 	if err != nil {
 		return err
 	}
@@ -64,6 +75,18 @@ func setupSetting() error {
 	httpPort := os.Getenv("HttpPort")
 	if len(httpPort) != 0 {
 		global.ServerSetting.HttpPort = httpPort
+	}
+	dbHost := os.Getenv("DB_HOST")
+	if dbHost != "" {
+		global.DatabaseSetting.Host = dbHost
+	}
+	dbPassword := os.Getenv("DB_PASSWORD")
+	if dbPassword != "" {
+		global.DatabaseSetting.Password = dbPassword
+	}
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret != "" {
+		global.JWTSetting.Secret = jwtSecret
 	}
 
 	global.ServerSetting.ReadTimeout *= time.Second

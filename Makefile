@@ -14,3 +14,6 @@ build:init
 
 deploy:build
 	scp -r ./forum tcloud:~/mg-forum
+
+test: init
+	go test ./...
